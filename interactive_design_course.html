@@ -1,0 +1,1924 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" x-data="academyApp()" :lang="isArabic ? 'ar' : 'en'" :dir="isArabic ? 'rtl' : 'ltr'">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title x-text="isArabic ? 'أكاديمية فضيل كرشاني للفنون البصرية التفاعلية' : 'Fodil Kerchani Cinematic Visual Academy'"></title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Tajawal:wght@300;400;500;700;900&family=Montserrat:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;1,900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Design Tokens & Theme overrides */
+        body {
+            font-family: 'Tajawal', 'Montserrat', sans-serif;
+            overflow-x: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+        
+        .amiri-title {
+            font-family: 'Amiri', 'Playfair Display', serif;
+        }
+        
+        .playfair-title {
+            font-family: 'Playfair Display', 'Amiri', serif;
+        }
+
+        .text-bronze {
+            color: #C5A059;
+        }
+        
+        .bg-bronze {
+            background-color: #C5A059;
+        }
+
+        /* Custom Sliders */
+        input[type=range] {
+            -webkit-appearance: none; width: 100%; background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%;
+            background: #C5A059; cursor: pointer; margin-top: -6px; box-shadow: 0 0 10px rgba(197,160,89,0.8);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 8px; cursor: pointer; background: rgba(255,255,255,0.15); border-radius: 4px;
+        }
+
+        /* Responsive transitions */
+        .page-fade {
+            animation: pageFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes pageFadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Pulse and glows for cinematic effect */
+        .glow-bronze {
+            box-shadow: 0 0 30px rgba(197, 160, 89, 0.15);
+        }
+    </style>
+    <script src="quizzes.js"></script>
+</head>
+<body 
+    :class="darkMode ? 'bg-[#0A0A0A] text-[#EAEAEA]' : 'bg-[#F5F4F0] text-[#1E1E1E]'"
+    :style="darkMode 
+        ? 'background-image: radial-gradient(circle at top, rgba(197, 160, 89, 0.08) 0%, rgba(10, 10, 10, 1) 75%)' 
+        : 'background-image: radial-gradient(circle at top, rgba(197, 160, 89, 0.05) 0%, rgba(245, 244, 240, 1) 75%)'"
+    class="selection:bg-[#C5A059] selection:text-[#0A0A0A]">
+
+    <!-- ================= NAVBAR ================= -->
+    <header 
+        :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10' : 'bg-[#FFFFFF]/80 border-[#C5A059]/20 shadow-lg'"
+        class="fixed top-0 w-full z-50 backdrop-blur-2xl border-b px-6 py-4 flex justify-between items-center transition-colors duration-500">
+        
+        <div class="flex items-center gap-3 cursor-pointer" @click="currentPage = 'home'">
+            <div class="w-10 h-10 flex items-center justify-center overflow-hidden">
+                <img src="logo.png" alt="Fodil Prod Logo" class="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(197,160,89,0.35)]">
+            </div>
+            <div class="playfair-title text-xl font-bold tracking-wider" :class="darkMode ? 'text-white' : 'text-[#1E1E1E]'">
+                FODIL <span class="text-bronze font-light">PROD.</span>
+            </div>
+        </div>
+        
+        <!-- Navigation Menu -->
+        <nav class="hidden lg:flex items-center gap-8 text-sm font-medium" :class="darkMode ? 'text-gray-300' : 'text-gray-700'">
+            <button @click="currentPage = 'home'; window.scrollTo(0,0);" class="hover:text-bronze transition" :class="currentPage === 'home' ? 'text-bronze font-bold' : ''" x-text="isArabic ? 'الرئيسية' : 'Home'"></button>
+            <button @click="currentPage = 'academy'; window.scrollTo(0,0);" class="hover:text-bronze transition" :class="currentPage === 'academy' ? 'text-bronze font-bold' : ''" x-text="isArabic ? 'أكاديمية الـ 32 لعبة' : '32 Games Academy'"></button>
+            <button @click="currentPage = 'elite'; startEliteMode(); window.scrollTo(0,0);" class="hover:text-bronze transition" :class="currentPage === 'elite' ? 'text-bronze font-bold' : ''" x-text="isArabic ? 'تحديات النخبة (10 ألعاب)' : 'Elite Challenges (10)'"></button>
+            <button @click="currentPage = 'knowledge'; window.scrollTo(0,0);" class="hover:text-bronze transition" :class="currentPage === 'knowledge' ? 'text-bronze font-bold' : ''" x-text="isArabic ? 'الموسوعة التفاعلية' : 'Knowledge Hub'"></button>
+            <button @click="currentPage = 'pro_tools'; window.scrollTo(0,0);" class="hover:text-bronze transition" :class="currentPage === 'pro_tools' ? 'text-bronze font-bold' : ''" x-text="isArabic ? 'أدوات المحترفين' : 'Pro Tools'"></button>
+            <button @click="currentPage = 'portfolio'; window.scrollTo(0,0);" class="hover:text-bronze transition" :class="currentPage === 'portfolio' ? 'text-bronze font-bold' : ''" x-text="isArabic ? 'معرض الأعمال' : 'Behance Portfolio'"></button>
+            <button @click="currentPage = 'about'; window.scrollTo(0,0);" class="hover:text-bronze transition" :class="currentPage === 'about' ? 'text-bronze font-bold' : ''" x-text="isArabic ? 'المدرب الفني' : 'Art Instructor'"></button>
+            <button @click="currentPage = 'montage_basics'; window.scrollTo(0,0);" class="hover:text-bronze transition" :class="currentPage === 'montage_basics' || currentPage === 'montage_vn' ? 'text-bronze font-bold' : ''" x-text="isArabic ? 'تعليم المونتاج' : 'Video Editing'"></button>
+        </nav>
+
+        <!-- Right Controls -->
+        <div class="flex items-center gap-3">
+            <!-- Light/Dark Mode Switcher -->
+            <button @click="darkMode = !darkMode" class="p-2.5 rounded-full border transition" :class="darkMode ? 'border-[#C5A059]/30 bg-[#C5A059]/5 hover:bg-[#C5A059]/15 text-[#C5A059]' : 'border-gray-300 bg-gray-100 hover:bg-gray-200 text-gray-700'">
+                <span x-show="darkMode">☀️</span>
+                <span x-show="!darkMode">🌙</span>
+            </button>
+
+            <!-- Language Switcher Pill -->
+            <button @click="isArabic = !isArabic" class="text-xs uppercase tracking-widest text-[#C5A059] font-bold hover:text-white transition px-4 py-2.5 border border-[#C5A059]/30 rounded-full bg-[#C5A059]/5 hover:bg-[#C5A059]/10">
+                <span x-show="isArabic">EN 🌐</span>
+                <span x-show="!isArabic">AR 🌐</span>
+            </button>
+            
+            <button @click="currentPage = 'about'; window.scrollTo(0,0);" class="hidden sm:block text-xs uppercase tracking-wider text-black font-extrabold bg-[#C5A059] hover:bg-[#EAEAEA] transition px-5 py-2.5 rounded-full shadow-[0_0_15px_rgba(197,160,89,0.3)]">
+                <span x-text="isArabic ? 'احجز استشارة' : 'Book Session'"></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ================= MAIN WRAPPER ================= -->
+    <main class="pt-28 min-h-screen pb-20 px-6 max-w-7xl mx-auto">
+        
+        <!-- ================= 1. HOME SCREEN (HERO & HUBS) ================= -->
+        <div x-show="currentPage === 'home'" class="page-fade space-y-20">
+            <!-- Hero Showcase Section -->
+            <div class="text-center space-y-6 pt-10 relative">
+                <div class="absolute inset-0 bg-[#C5A059]/5 blur-[120px] rounded-full max-w-lg mx-auto -top-10"></div>
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-xs font-bold uppercase tracking-wider" :class="darkMode ? 'bg-[#1A1A1A] border-[#C5A059]/20 text-[#C5A059]' : 'bg-[#FFFFFF] border-[#C5A059]/40 text-[#9C7A3C] shadow-sm'">
+                    ✨ <span x-text="isArabic ? 'أكاديمية الفنون البصرية المدمجة بالألعاب' : 'Gamified Visual Arts Academy'"></span>
+                </div>
+                
+                <h1 class="amiri-title text-5xl md:text-7xl font-black tracking-tight leading-tight max-w-4xl mx-auto" :class="darkMode ? 'text-white' : 'text-[#1E1E1E]'">
+                    <span x-show="isArabic">حير تلتقي <strong class="text-bronze font-normal">دقة العلم</strong> بفخامة الفن السينمائي</span>
+                    <span x-show="!isArabic">Where <strong class="text-bronze font-normal">Scientific Precision</strong> Meets Cinema</span>
+                </h1>
+                
+                <p class="max-w-2xl mx-auto text-lg md:text-xl font-light leading-relaxed" :class="darkMode ? 'text-gray-400' : 'text-gray-600'" x-text="isArabic ? 'منصة متكاملة تحت إشراف المخرج الفني Fodil Kerchani تدمج بين التحديات التفاعلية التنافسية، والذكاء الاصطناعي، والتعليم الأكاديمي الرصين.' : 'A high-end platform directed by Art Director Fodil Kerchani, merging visual competitive games, generative AI workflows, and scientific design theory.'"></p>
+                
+                <div class="flex flex-wrap justify-center gap-4 pt-6">
+                    <button @click="currentPage = 'academy'; window.scrollTo(0,0);" class="px-8 py-4 rounded-full bg-bronze text-black font-extrabold text-md shadow-[0_4px_20px_rgba(197,160,89,0.35)] hover:scale-105 transition" x-text="isArabic ? 'ابدأ تحدي الـ 32 لعبة' : 'Start 32 Games Challenge'"></button>
+                    <button @click="currentPage = 'elite'; startEliteMode(); window.scrollTo(0,0);" class="px-8 py-4 rounded-full bg-transparent hover:bg-white/5 border border-white/20 text-white font-bold text-md transition" :class="darkMode ? 'text-white border-white/20 hover:bg-white/5' : 'text-[#1E1E1E] border-gray-400 hover:bg-gray-150'" x-text="isArabic ? 'تحديات النخبة (10 ألعاب)' : 'Elite Medium Challenges'"></button>
+                </div>
+            </div>
+
+            <!-- Features Quick Portal Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- 1. The 32 Games -->
+                <div 
+                    :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10 hover:border-[#C5A059]/30' : 'bg-white/90 border-[#C5A059]/25 hover:border-[#C5A059]/40 shadow-lg'" 
+                    class="p-8 flex flex-col justify-between rounded-[20px] border transition-all duration-300 group hover:-translate-y-1">
+                    <div class="space-y-4">
+                        <div class="w-12 h-12 rounded-xl bg-[#C5A059]/10 flex items-center justify-center text-xl text-bronze">🎯</div>
+                        <h3 class="amiri-title text-2xl font-bold" :class="darkMode ? 'text-white' : 'text-[#1E1E1E]'" x-text="isArabic ? 'مستويات التحدي الـ 32' : 'The 32 Level Academy'"></h3>
+                        <p class="text-sm leading-relaxed" :class="darkMode ? 'text-gray-400' : 'text-gray-600'" x-text="isArabic ? 'صقل حواسك البصرية عبر 32 تحدياً ديناميكياً يتوزع على التوازن والتباين والمحاذاة والمساحات السلبية مع نظام تنقيط صارم.' : 'Train your creative eye across 32 dynamic challenges covering Balance, Contrast, Alignment and Negative Space with visual scoring.'"></p>
+                    </div>
+                    <button @click="currentPage = 'academy'; window.scrollTo(0,0);" class="mt-8 text-xs font-bold text-bronze hover:underline flex items-center gap-2 group-hover:translate-x-1 transition duration-300">
+                        <span x-text="isArabic ? 'ادخل التحديات الآن' : 'Enter Academy Levels'"></span> &larr;
+                    </button>
+                </div>
+
+                <!-- 2. Medium Difficulty Elite Games -->
+                <div 
+                    :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/20 hover:border-[#C5A059]/40 shadow-[0_0_20px_rgba(197,160,89,0.05)]' : 'bg-white/90 border-[#C5A059]/30 hover:border-[#C5A059]/50 shadow-[0_4px_25px_rgba(0,0,0,0.05)]'" 
+                    class="p-8 flex flex-col justify-between rounded-[20px] border transition-all duration-300 group hover:-translate-y-1">
+                    <div class="space-y-4">
+                        <div class="w-12 h-12 rounded-xl bg-[#C5A059]/20 flex items-center justify-center text-xl text-bronze">🏆</div>
+                        <h3 class="amiri-title text-2xl font-bold flex items-center gap-2" :class="darkMode ? 'text-white' : 'text-[#1E1E1E]'">
+                            <span x-text="isArabic ? 'ألعاب النخبة (10 تحديات)' : '10 Elite Medium Games'"></span>
+                            <span class="text-xs bg-[#C5A059]/20 px-2 py-0.5 rounded text-bronze">متقدم</span>
+                        </h3>
+                        <p class="text-sm leading-relaxed" :class="darkMode ? 'text-gray-400' : 'text-gray-600'" x-text="isArabic ? 'ألعاب مبتكرة بمستوى صعوبة متوسط تختبر النسبة الذهبية والتباين والشبكات الهندسية والمركز البصري وتصميم الخطوط بصورة تنافسية عالية.' : 'Medium-difficulty competitive challenges testing golden ratios, optical padding, grid snapping, logo gravity, and micro-typography.'"></p>
+                    </div>
+                    <button @click="currentPage = 'elite'; startEliteMode(); window.scrollTo(0,0);" class="mt-8 text-xs font-bold text-bronze hover:underline flex items-center gap-2 group-hover:translate-x-1 transition duration-300">
+                        <span x-text="isArabic ? 'ابدأ التحديات التنافسية' : 'Launch Elite Games'"></span> &larr;
+                    </button>
+                </div>
+
+                <!-- 3. Knowledge Hub -->
+                <div 
+                    :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10 hover:border-[#C5A059]/30' : 'bg-white/90 border-[#C5A059]/25 hover:border-[#C5A059]/40 shadow-lg'" 
+                    class="p-8 flex flex-col justify-between rounded-[20px] border transition-all duration-300 group hover:-translate-y-1">
+                    <div class="space-y-4">
+                        <div class="w-12 h-12 rounded-xl bg-[#C5A059]/10 flex items-center justify-center text-xl text-bronze">📚</div>
+                        <h3 class="amiri-title text-2xl font-bold" :class="darkMode ? 'text-white' : 'text-[#1E1E1E]'" x-text="isArabic ? 'الموسوعة الأكاديمية التفاعلية' : 'Interactive Knowledge Hub'"></h3>
+                        <p class="text-sm leading-relaxed" :class="darkMode ? 'text-gray-400' : 'text-gray-600'" x-text="isArabic ? 'موسوعة متكاملة بدون روابط خارجية تلخص أفضل الممارسات العالمية في التايبوغرافي وسيكولوجية تجربة المستخدم والذكاء الاصطناعي.' : 'A visually structured wiki, highlighting global design rules, typography guides, and advanced UX frameworks in concise cards.'"></p>
+                    </div>
+                    <button @click="currentPage = 'knowledge'; window.scrollTo(0,0);" class="mt-8 text-xs font-bold text-bronze hover:underline flex items-center gap-2 group-hover:translate-x-1 transition duration-300">
+                        <span x-text="isArabic ? 'تصفح الموسوعة' : 'Browse Hub'"></span> &larr;
+                    </button>
+                </div>
+            </div>
+
+            <!-- 🎮 VIDEO EDITING GAME BANNER -->
+            <a href="editing_game.html" target="_blank" class="block group">
+                <div :class="darkMode ? 'bg-gradient-to-r from-[#0D0D0D] via-[#1A1200] to-[#0D0D0D] border-[#C5A059]/40 hover:border-[#C5A059]/80 shadow-[0_0_40px_rgba(197,160,89,0.15)] hover:shadow-[0_0_60px_rgba(197,160,89,0.3)]' : 'bg-gradient-to-r from-[#FFF9F0] via-[#FFFBF2] to-[#FFF9F0] border-[#C5A059]/40 hover:border-[#C5A059]/70 shadow-lg hover:shadow-xl'" 
+                     class="relative overflow-hidden p-8 rounded-[24px] border transition-all duration-500 group-hover:-translate-y-1">
+                    <!-- BG glow orbs -->
+                    <div class="absolute -left-10 top-1/2 -translate-y-1/2 w-40 h-40 bg-[#C5A059]/10 rounded-full blur-[60px] pointer-events-none"></div>
+                    <div class="absolute -right-10 top-1/2 -translate-y-1/2 w-40 h-40 bg-[#C5A059]/10 rounded-full blur-[60px] pointer-events-none"></div>
+                    <!-- Film strip decoration -->
+                    <div class="absolute inset-y-0 left-0 w-3 flex flex-col justify-around pointer-events-none opacity-30">
+                        <div class="h-4 bg-[#C5A059]/60 rounded-r"></div><div class="h-4 bg-[#C5A059]/60 rounded-r"></div>
+                        <div class="h-4 bg-[#C5A059]/60 rounded-r"></div><div class="h-4 bg-[#C5A059]/60 rounded-r"></div>
+                        <div class="h-4 bg-[#C5A059]/60 rounded-r"></div>
+                    </div>
+                    <div class="absolute inset-y-0 right-0 w-3 flex flex-col justify-around pointer-events-none opacity-30">
+                        <div class="h-4 bg-[#C5A059]/60 rounded-l"></div><div class="h-4 bg-[#C5A059]/60 rounded-l"></div>
+                        <div class="h-4 bg-[#C5A059]/60 rounded-l"></div><div class="h-4 bg-[#C5A059]/60 rounded-l"></div>
+                        <div class="h-4 bg-[#C5A059]/60 rounded-l"></div>
+                    </div>
+                    <div class="relative z-10 flex flex-col md:flex-row items-center gap-8">
+                        <!-- Icon -->
+                        <div class="text-6xl md:text-7xl flex-shrink-0 group-hover:scale-110 transition-transform duration-500">🎬</div>
+                        <!-- Text -->
+                        <div class="flex-1 text-center md:text-right">
+                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest mb-3" :class="darkMode ? 'bg-[#C5A059]/15 border border-[#C5A059]/30 text-[#C5A059]' : 'bg-[#C5A059]/10 border border-[#C5A059]/30 text-[#9C7A3C]'">
+                                🕹 <span x-text="isArabic ? 'لعبة تفاعلية جديدة' : 'New Interactive Game'"></span>
+                            </div>
+                            <h3 class="amiri-title text-3xl font-black mb-2" :class="darkMode ? 'text-white' : 'text-[#1E1E1E]'">
+                                <span x-show="isArabic">محاكي المونتاج <strong class="text-[#C5A059]">السينمائي</strong></span>
+                                <span x-show="!isArabic"><strong class="text-[#C5A059]">Cinematic</strong> Editing Simulator</span>
+                            </h3>
+                            <p class="text-sm leading-relaxed max-w-lg" :class="darkMode ? 'text-gray-400' : 'text-gray-600'">
+                                <span x-show="isArabic">جرّب تجربة المونتاج الكاملة: من استيراد المقاطع ✂️ تقطيعها ✨ إضافة التأثيرات 🎵 الموسيقى 📤 حتى التصدير النهائي.</span>
+                                <span x-show="!isArabic">Experience the full editing workflow: Import clips ✂️ Cut & trim ✨ Add effects 🎵 Music 📤 Export.</span>
+                            </p>
+                            <!-- Stats -->
+                            <div class="flex flex-wrap justify-center md:justify-start gap-4 mt-4">
+                                <div class="text-center">
+                                    <div class="text-xl font-black text-[#C5A059]">5</div>
+                                    <div class="text-xs" :class="darkMode ? 'text-gray-500' : 'text-gray-400'" x-text="isArabic ? 'مراحل' : 'Stages'"></div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-xl font-black text-[#C5A059]">1000+</div>
+                                    <div class="text-xs" :class="darkMode ? 'text-gray-500' : 'text-gray-400'" x-text="isArabic ? 'نقطة' : 'Points'"></div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-xl font-black text-[#C5A059]">⭐⭐⭐</div>
+                                    <div class="text-xs" :class="darkMode ? 'text-gray-500' : 'text-gray-400'" x-text="isArabic ? 'تقييم' : 'Rating'"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- CTA -->
+                        <div class="flex-shrink-0">
+                            <div class="px-8 py-4 rounded-2xl font-black text-black text-sm shadow-[0_0_25px_rgba(197,160,89,0.4)] group-hover:shadow-[0_0_45px_rgba(197,160,89,0.6)] group-hover:scale-105 transition-all duration-300 flex items-center gap-2" style="background: linear-gradient(135deg, #C5A059, #E8C87A);">
+                                <span x-text="isArabic ? '▶ العب الآن' : '▶ Play Now'"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Visual Statement Quote (Chiaroscuro Cinematic Concept) -->
+            <div :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10' : 'bg-white border-[#C5A059]/20 shadow-lg'" class="p-12 text-center relative overflow-hidden flex flex-col items-center rounded-[20px] border">
+                <div class="absolute inset-0 bg-gradient-to-r from-black via-transparent to-black opacity-40 z-0"></div>
+                <div class="absolute -right-20 -top-20 w-60 h-60 bg-[#C5A059]/5 rounded-full blur-[100px]"></div>
+                
+                <div class="relative z-10 max-w-3xl space-y-6">
+                    <span class="text-4xl text-bronze">“</span>
+                    <p class="amiri-title text-3xl md:text-4xl italic leading-relaxed font-light" :class="darkMode ? 'text-gray-200' : 'text-gray-800'">
+                        <span x-show="isArabic">إن التصميم الحقيقي ليس مجرد ترتيب عناصر بصرية، بل هو عملية هندسة بصرية وثقافية للمشاعر الإنسانية، وتناغم بين المنطق العلمي وفوضى الفن.</span>
+                        <span x-show="!isArabic">True design is not just arranging pixels; it is the visual engineering of human emotion, establishing a dialogue between scientific logic and artistic chaos.</span>
+                    </p>
+                    <div class="h-0.5 w-16 bg-bronze mx-auto my-4"></div>
+                    <p class="text-xs uppercase tracking-widest text-[#C5A059] font-bold" x-text="isArabic ? 'فضيل كرشاني — المخرج الفني' : 'Fodil Kerchani — Art Director'"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= 2. ACADEMY: 32 LEVEL CHALLENGE ENGINE ================= -->
+        <div x-show="currentPage === 'academy'" class="page-fade space-y-8" style="display: none;">
+            
+            <!-- Category Chooser Dashboard -->
+            <div x-show="academyMode === 'hub'">
+                <div class="text-center space-y-4 mb-12">
+                    <h2 class="amiri-title text-5xl font-black" :class="darkMode ? 'text-white' : 'text-[#1E1E1E]'" x-text="isArabic ? 'أكاديمية التدريب البصري' : 'Visual Training Academy'"></h2>
+                    <p class="text-md" :class="darkMode ? 'text-gray-400' : 'text-gray-600'" x-text="isArabic ? 'اختر إحدى القواعد الذهبية واجتاز 8 مستويات تفاعلية متدرجة الصعوبة لجمع النقاط' : 'Choose a core principle and beat 8 progressive interactive levels to secure your design score'"></p>
+                </div>
+                
+                
+            <div class="w-full mb-8 rounded-[20px] overflow-hidden border" :class="darkMode ? 'border-[#C5A059]/20 shadow-[0_0_30px_rgba(197,160,89,0.15)]' : 'border-[#C5A059]/30 shadow-lg'">
+                <img src="vn_basics.png" alt="Video Editing Basics" class="w-full h-[400px] object-cover hover:scale-105 transition-transform duration-700">
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <template x-for="(cat, key) in categories" :key="key">
+                        <button 
+                            @click="startCategory(key)" 
+                            :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10 hover:border-[#C5A059]' : 'bg-white border-[#C5A059]/20 hover:border-bronze-solid shadow-md'"
+                            class="p-8 text-right flex flex-col justify-between items-start group rounded-[20px] border transition-all duration-300 min-h-[220px]">
+                            <div class="w-full flex justify-between items-start">
+                                <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl bg-white/5 border border-[#C5A059]/20" :style="`color: ${cat.color}`">
+                                    <span x-show="key === 'balance'">⚖️</span>
+                                    <span x-show="key === 'contrast'">🌗</span>
+                                    <span x-show="key === 'alignment'">📐</span>
+                                    <span x-show="key === 'whitespace'">💨</span>
+                                </div>
+                                <div class="text-xs font-extrabold uppercase tracking-widest text-bronze bg-[#C5A059]/10 px-3 py-1 rounded-full">
+                                    8 <span x-text="isArabic ? 'مستويات' : 'Levels'"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-2 mt-6">
+                                <h3 class="amiri-title text-3xl font-black group-hover:text-bronze transition" :class="darkMode ? 'text-white' : 'text-[#1E1E1E]'" x-text="isArabic ? cat.titleAr : cat.titleEn"></h3>
+                                <p class="text-sm" :class="darkMode ? 'text-gray-400' : 'text-gray-600'" x-text="isArabic ? cat.descAr : cat.descEn"></p>
+                            </div>
+                        </button>
+                    </template>
+                </div>
+
+                <!-- 🎮 EDITING GAME CARD inside Academy -->
+                <div class="mt-10">
+                    <a href="editing_game.html" target="_blank" class="block group">
+                        <div :class="darkMode ? 'bg-[#0D0D0D] border-[#C5A059]/40 hover:border-[#C5A059] shadow-[0_0_30px_rgba(197,160,89,0.1)] hover:shadow-[0_0_60px_rgba(197,160,89,0.25)]' : 'bg-[#FFFBF2] border-[#C5A059]/40 hover:border-[#C5A059]/80 shadow-md hover:shadow-xl'"
+                             class="relative overflow-hidden p-6 md:p-8 rounded-[20px] border transition-all duration-400 group-hover:-translate-y-1 flex flex-col md:flex-row items-center gap-6">
+                            <!-- Film strip left -->
+                            <div class="absolute inset-y-0 left-0 w-2.5 flex flex-col justify-around opacity-25 pointer-events-none">
+                                <div class="h-3 bg-[#C5A059] rounded-r"></div><div class="h-3 bg-[#C5A059] rounded-r"></div>
+                                <div class="h-3 bg-[#C5A059] rounded-r"></div><div class="h-3 bg-[#C5A059] rounded-r"></div>
+                                <div class="h-3 bg-[#C5A059] rounded-r"></div><div class="h-3 bg-[#C5A059] rounded-r"></div>
+                            </div>
+                            <!-- Film strip right -->
+                            <div class="absolute inset-y-0 right-0 w-2.5 flex flex-col justify-around opacity-25 pointer-events-none">
+                                <div class="h-3 bg-[#C5A059] rounded-l"></div><div class="h-3 bg-[#C5A059] rounded-l"></div>
+                                <div class="h-3 bg-[#C5A059] rounded-l"></div><div class="h-3 bg-[#C5A059] rounded-l"></div>
+                                <div class="h-3 bg-[#C5A059] rounded-l"></div><div class="h-3 bg-[#C5A059] rounded-l"></div>
+                            </div>
+                            <!-- Glow -->
+                            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-[#C5A059]/5 to-transparent pointer-events-none"></div>
+                            <!-- Icon -->
+                            <div class="text-5xl md:text-6xl group-hover:scale-110 transition-transform duration-500 flex-shrink-0 relative z-10">🎬</div>
+                            <!-- Content -->
+                            <div class="flex-1 text-center md:text-right relative z-10">
+                                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest mb-2 bg-[#C5A059]/10 border border-[#C5A059]/30 text-[#C5A059]">
+                                    🕹 <span x-text="isArabic ? 'لعبة تفاعلية — جديد' : 'Interactive Game — New'"></span>
+                                </div>
+                                <h3 class="amiri-title text-2xl md:text-3xl font-black mb-1" :class="darkMode ? 'text-white' : 'text-[#1E1E1E]'">
+                                    <span x-show="isArabic">محاكي المونتاج <span class="text-[#C5A059]">السينمائي</span></span>
+                                    <span x-show="!isArabic"><span class="text-[#C5A059]">Cinematic</span> Editing Simulator</span>
+                                </h3>
+                                <p class="text-sm" :class="darkMode ? 'text-gray-400' : 'text-gray-600'">
+                                    <span x-show="isArabic">استيراد ✂️ قطع ✨ تأثيرات 🎵 صوت 📤 تصدير — 5 مراحل كاملة تحاكي سير عمل المونتاج الحقيقي</span>
+                                    <span x-show="!isArabic">Import ✂️ Cut ✨ Effects 🎵 Audio 📤 Export — 5 stages simulating a real editing workflow</span>
+                                </p>
+                                <div class="flex flex-wrap justify-center md:justify-start gap-3 mt-3">
+                                    <span class="text-xs px-2 py-0.5 rounded-full border border-[#C5A059]/30 text-[#C5A059] bg-[#C5A059]/5">5 مراحل</span>
+                                    <span class="text-xs px-2 py-0.5 rounded-full border border-green-500/30 text-green-400 bg-green-500/5">1000+ نقطة</span>
+                                    <span class="text-xs px-2 py-0.5 rounded-full border border-blue-400/30 text-blue-400 bg-blue-400/5">تقييم بالنجوم ⭐⭐⭐</span>
+                                </div>
+                            </div>
+                            <!-- CTA -->
+                            <div class="relative z-10 flex-shrink-0">
+                                <div class="px-6 py-3 rounded-xl font-black text-black text-sm group-hover:scale-105 transition-all duration-300 shadow-[0_0_20px_rgba(197,160,89,0.3)] group-hover:shadow-[0_0_40px_rgba(197,160,89,0.5)]" style="background:linear-gradient(135deg,#C5A059,#E8C87A);">
+                                    <span x-text="isArabic ? '▶ العب الآن' : '▶ Play Now'"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Level Playing Field -->
+            <div x-show="academyMode === 'playing'" class="space-y-6">
+                <div class="flex justify-between items-center pb-4 border-b border-[#C5A059]/10">
+                    <button @click="academyMode = 'hub'" class="hover:text-bronze flex items-center gap-2 font-bold transition" :class="darkMode ? 'text-gray-400' : 'text-gray-700'">
+                        <span>&larr;</span> <span x-text="isArabic ? 'الخروج والتراجع' : 'Exit Challenge'"></span>
+                    </button>
+                    
+                    <div class="flex items-center gap-6">
+                        <div :class="darkMode ? 'text-gray-400' : 'text-gray-600'" class="text-sm"><span x-text="isArabic ? 'المستوى' : 'Level'"></span> <span class="font-bold text-xl" :class="darkMode ? 'text-white' : 'text-black'" x-text="currentLevelIndex + 1"></span> / 8</div>
+                        <div :class="darkMode ? 'text-gray-400' : 'text-gray-600'" class="text-sm"><span x-text="isArabic ? 'النقاط:' : 'Score:'"></span> <span class="text-bronze font-bold text-xl" x-text="score"></span></div>
+                    </div>
+                </div>
+
+                <template x-if="currentLevel">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                        <!-- Play Panel -->
+                        <div :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10' : 'bg-white border-[#C5A059]/20 shadow-lg'" class="lg:col-span-8 p-8 min-h-[500px] flex flex-col justify-center relative overflow-hidden rounded-[20px] border bg-black/40">
+                            
+                            <!-- TYPE 1: A/B Visual Choice -->
+                            <template x-if="currentLevel.type === 'ab_quiz'">
+                                <div class="flex flex-col md:flex-row gap-6 w-full">
+                                    <template x-for="opt in currentLevel.options" :key="opt.id">
+                                        <button @click="submitAnswer(opt.isCorrect)" class="relative flex-1 rounded-2xl overflow-hidden border-2 border-[#C5A059]/10 hover:border-bronze-solid transition-all duration-300 min-h-[350px] group flex flex-col justify-end p-6">
+                                            <img :src="opt.img" class="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:scale-105 transition-transform duration-500">
+                                            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+                                            
+                                            <!-- Interactive Layout Demonstration -->
+                                            <div class="relative z-10 w-full h-full flex p-4" :style="opt.wrapperStyle || ''">
+                                                
+                                                <!-- Balance / Alignment Demonstration -->
+                                                <template x-if="currentCategory === 'balance' || currentCategory === 'alignment'">
+                                                    <div class="w-full h-full flex flex-col transition-all duration-500" :style="opt.badStyle || 'justify-content: center; align-items: center;'">
+                                                        <div class="w-3/4 h-12 bg-bronze rounded-lg shadow-lg mb-3 opacity-90 border border-[#C5A059]/30"></div>
+                                                        <div class="w-1/2 h-8 bg-white/80 rounded-lg shadow-lg opacity-80"></div>
+                                                    </div>
+                                                </template>
+
+                                                <!-- Contrast Visuals -->
+                                                <template x-if="currentCategory === 'contrast'">
+                                                    <div class="w-full h-full flex justify-center items-center">
+                                                        <h4 class="playfair-title text-3xl font-black text-center leading-normal" :style="opt.textStyle">Visual Contrast</h4>
+                                                    </div>
+                                                </template>
+
+                                                <!-- Whitespace Visuals -->
+                                                <template x-if="currentCategory === 'whitespace'">
+                                                    <div class="w-full h-full flex justify-center items-center">
+                                                        <div class="bg-black/95 p-4 rounded-xl border border-[#C5A059]/20 transition-all duration-500" :style="opt.padding">
+                                                            <h4 class="text-sm font-bold text-white mb-1">Minimalism</h4>
+                                                            <p class="text-xs text-gray-400">Space heals the visual soul.</p>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </button>
+                                    </template>
+                                </div>
+                            </template>
+
+                            <!-- TYPE 2: Dynamic Sliders -->
+                            <template x-if="currentLevel.type === 'interactive_slider'">
+                                <div class="w-full max-w-xl mx-auto space-y-8 bg-black/60 p-8 rounded-2xl border border-[#C5A059]/20">
+                                    <div class="min-h-[200px] flex items-center justify-center rounded-xl bg-[#1A1A1A] p-6 relative overflow-hidden">
+                                        <!-- Interactive Contrast Mode -->
+                                        <template x-if="currentCategory === 'contrast'">
+                                            <div class="w-full text-center p-6 rounded-lg transition-all" :style="`background-color: rgb(${currentLevel.sliderValue}, ${currentLevel.sliderValue}, ${currentLevel.sliderValue})`">
+                                                <h4 class="playfair-title text-2xl font-black" :style="`color: rgb(${255 - currentLevel.sliderValue}, ${255 - currentLevel.sliderValue}, ${255 - currentLevel.sliderValue})`">Legibility Balance</h4>
+                                            </div>
+                                        </template>
+                                        
+                                        <!-- Interactive Whitespace Padding -->
+                                        <template x-if="currentCategory === 'whitespace'">
+                                            <div class="bg-white/5 border border-white/10 rounded-lg mx-auto flex items-center justify-center transition-all" :style="`padding: ${currentLevel.sliderValue}px; width: 100%;`">
+                                                <div class="bg-bronze text-black font-extrabold text-sm p-4 rounded-md shadow-lg text-center w-full">
+                                                    Content Core
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                    
+                                    <div class="space-y-4">
+                                        <input type="range" min="0" max="100" x-model="currentLevel.sliderValue" class="w-full">
+                                        <button @click="checkSliderAnswer()" class="w-full py-3.5 rounded-full font-bold text-sm bg-bronze text-black shadow-lg hover:bg-white transition" x-text="isArabic ? 'اعتماد قيمة التعديل' : 'Submit Adjusted Value'"></button>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <!-- TYPE 3: Layout Fixer -->
+                            <template x-if="currentLevel.type === 'interactive_fix'">
+                                <div class="w-full space-y-6">
+                                    <div class="w-full min-h-[300px] bg-black/40 border border-white/5 rounded-2xl p-6 relative flex flex-col transition-all duration-1000" :style="currentLevel.isFixed ? currentLevel.goodStyle : currentLevel.badStyle">
+                                        <div class="w-48 h-12 bg-white rounded-lg opacity-80 mb-3 border border-[#C5A059]/20 transition-all duration-1000"></div>
+                                        <div class="w-32 h-8 bg-bronze rounded-lg opacity-90 transition-all duration-1000"></div>
+                                    </div>
+                                    <div class="flex justify-center">
+                                        <button @click="currentLevel.isFixed = true; setTimeout(() => submitAnswer(true), 1000)" class="px-8 py-3.5 rounded-full font-bold text-sm bg-white text-black hover:bg-bronze transition shadow-lg" :class="darkMode ? 'bg-white text-black' : 'bg-gray-800 text-white'" x-text="isArabic ? 'تطبيق الإصلاح التلقائي (Fix Layout)' : 'Apply Layout Correction'"></button>
+                                    </div>
+                                </div>
+                            </template>
+
+                        </div>
+
+                        <!-- Sidebar Feedback / Info -->
+                        <div class="lg:col-span-4 space-y-6">
+                            <div :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10' : 'bg-white border-[#C5A059]/20 shadow-md'" class="p-6 space-y-4 rounded-[20px] border">
+                                <h3 class="amiri-title text-3xl font-black text-bronze" x-text="isArabic ? categories[currentCategory].titleAr : categories[currentCategory].titleEn"></h3>
+                                <p class="text-sm leading-relaxed" :class="darkMode ? 'text-gray-300' : 'text-gray-700'" x-text="currentLevel.question"></p>
+                            </div>
+
+                            <!-- Success/Failure Feedback Box -->
+                            <div x-show="showFeedback" :class="darkMode ? 'bg-[#1A1A1A]/70 border-2' : 'bg-white border-2 shadow-md'" class="p-6 rounded-[20px] page-fade" :class="feedbackType === 'correct' ? 'border-green-600' : 'border-red-900'">
+                                <h4 class="text-xl font-bold flex items-center gap-2">
+                                    <span x-show="feedbackType === 'correct'" class="text-green-500" x-text="isArabic ? '✅ إجابة مثالية وموفقة!' : '✅ Perfectly balanced!'"></span>
+                                    <span x-show="feedbackType === 'wrong'" class="text-red-500" x-text="isArabic ? '❌ خطأ! انتبه للتفاصيل.' : '❌ Mismatched rules!'"></span>
+                                </h4>
+                                <p class="text-xs text-gray-400 mt-2" x-text="isArabic ? 'الحس البصري يتطلب تدريباً مستمراً على قياس الكتل والأوزان.' : 'Visual art demands continuous alignment checks.'"></p>
+                                
+                                <div class="mt-4">
+                                    <button x-show="feedbackType === 'correct'" @click="nextLevel()" class="w-full py-3.5 rounded-full font-bold text-sm bg-white text-black hover:bg-bronze transition shadow-md" :class="darkMode ? 'bg-white text-black hover:bg-bronze' : 'bg-gray-800 text-white hover:bg-bronze'" x-text="isArabic ? 'المستوى التالي &larr;' : 'Next Level &larr;'"></button>
+                                    <button x-show="feedbackType === 'wrong'" @click="showFeedback = false" class="w-full py-3.5 rounded-full font-bold text-sm bg-white/10 text-white hover:bg-white/20 border border-white/10 transition" :class="darkMode ? 'text-white' : 'text-gray-700'" x-text="isArabic ? 'إعادة المحاولة' : 'Try Again'"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Completion Banner -->
+            <div x-show="academyMode === 'complete'" class="page-fade text-center py-20 max-w-xl mx-auto space-y-6">
+                <div class="text-7xl">🏆</div>
+                <h2 class="amiri-title text-4xl font-bold" :class="darkMode ? 'text-white' : 'text-black'" x-text="isArabic ? 'أنهيت التحدي بنجاح!' : 'Challenge Successfully Beaten!'"></h2>
+                <p class="text-md" :class="darkMode ? 'text-gray-400' : 'text-gray-600'" x-text="isArabic ? 'تهانينا، لقد تمكنت من صقل قدرتك البصرية وفهم الأوزان الهندسية بنجاح متميز.' : 'Incredible control! You have proved your conceptual visual capability across the core basics.'"></p>
+                <div :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10' : 'bg-white border-[#C5A059]/20 shadow-md'" class="p-6 inline-block rounded-[20px] border">
+                    <span class="text-xs uppercase tracking-widest text-[#C5A059] block mb-2" x-text="isArabic ? 'الدرجة التنافسية الإجمالية' : 'Total Unified Academy Score'"></span>
+                    <span class="text-5xl font-black text-bronze" x-text="score"></span> / 80
+                </div>
+                <div class="pt-4">
+                    <button @click="academyMode = 'hub'" class="px-8 py-3.5 rounded-full bg-bronze text-black font-extrabold text-sm shadow-md hover:bg-white transition" x-text="isArabic ? 'الرجوع لاختيار قاعدة أخرى' : 'Select Another Track'"></button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ================= 3. ELITE COMPETITIVE CHALLENGES (10 HIGH FIDELITY MEDIUM DIFFICULTY GAMES) ================= -->
+        <div x-show="currentPage === 'elite'" class="page-fade space-y-8" style="display: none;">
+            
+            <div class="text-center space-y-4 mb-10">
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-[#C5A059]/10 text-bronze text-xs font-bold uppercase tracking-widest border border-[#C5A059]/20">
+                    💎 Elite Arena
+                </div>
+                <h2 class="amiri-title text-5xl font-black" :class="darkMode ? 'text-white' : 'text-[#1E1E1E]'" x-text="isArabic ? 'ميدان تحديات النخبة المتوسطة' : '10 Medium Difficulty Elite Challenges'"></h2>
+                <p class="text-sm max-w-xl mx-auto" :class="darkMode ? 'text-gray-400' : 'text-gray-600'" x-text="isArabic ? '10 ألعاب وتحديات بصرية تنافسية مصممة لاختبار قراراتك البصرية الدقيقة بمؤشرات تقييم فوري ونظام درجات تنافسي.' : '10 interactive competitive mini-games assessing golden crop ratios, HSL visual variations, contrast WCAG standards, and microtypography scales.'"></p>
+            </div>
+
+            <!-- Games Grid Navigator -->
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <template x-for="(g, idx) in eliteGames" :key="idx">
+                    <button 
+                        @click="selectEliteGame(idx)" 
+                        :class="darkMode 
+                            ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10 hover:border-bronze-solid' 
+                            : 'bg-white border-gray-200 hover:border-bronze-solid shadow-sm'"
+                        class="p-4 text-center rounded-[15px] border transition duration-300 flex flex-col items-center gap-2" 
+                        :class="currentEliteGameIndex === idx ? 'border-bronze-solid glow-bronze' : ''">
+                        <span class="text-2xl" x-text="g.icon"></span>
+                        <span class="text-xs font-extrabold line-clamp-1" :class="darkMode ? 'text-white' : 'text-black'" x-text="isArabic ? g.titleAr : g.titleEn"></span>
+                        <span class="text-[10px] text-bronze" x-text="`Game ${idx + 1}`"></span>
+                    </button>
+                </template>
+            </div>
+
+            <!-- Active Elite Game Area -->
+            <div :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/20' : 'bg-white border-[#C5A059]/30 shadow-lg'" class="p-8 min-h-[500px] flex flex-col justify-between relative rounded-[20px] border">
+                
+                <template x-if="activeEliteGame">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full">
+                        
+                        <!-- Left Gameplay Area -->
+                        <div class="lg:col-span-8 flex flex-col justify-center min-h-[400px] bg-black/40 rounded-xl p-6 border border-white/5 relative">
+                            
+                            <!-- GAME 1: Color Odd-One-Out -->
+                            <template x-if="currentEliteGameIndex === 0">
+                                <div class="space-y-6 text-center w-full">
+                                    <div class="text-sm text-bronze"><span x-text="isArabic ? 'المستوى الحالي:' : 'Current Hardness Level:'"></span> <span class="font-bold text-white text-lg" x-text="eliteDifficulty"></span></div>
+                                    <div class="grid grid-cols-3 gap-4 max-w-sm mx-auto">
+                                        <template x-for="(box, bIdx) in oddColorGrid" :key="bIdx">
+                                            <button @click="submitOddColorChoice(bIdx)" class="aspect-square rounded-xl shadow-lg border border-white/10 hover:scale-105 transition" :style="`background-color: ${box.color}`"></button>
+                                        </template>
+                                    </div>
+                                    <button @click="resetOddColorGame()" class="px-4 py-2 rounded-full border border-white/10 text-xs font-bold text-gray-400 hover:text-white" x-text="isArabic ? 'إعادة توليد اللعبة' : 'Regenerate Palette'"></button>
+                                </div>
+                            </template>
+
+                            <!-- GAME 2: Typography Scale Matcher -->
+                            <template x-if="currentEliteGameIndex === 1">
+                                <div class="space-y-8 w-full max-w-lg mx-auto">
+                                    <div class="space-y-4 text-center border border-white/5 p-8 rounded-xl bg-black/50">
+                                        <h1 class="amiri-title text-white" :style="`font-size: ${24 * typographyScale}px`"><span x-text="isArabic ? 'العنوان الأكاديمي الكبير' : 'Main Typographic Header'"></span></h1>
+                                        <h2 class="amiri-title text-bronze" :style="`font-size: ${16 * typographyScale}px`"><span x-text="isArabic ? 'العنوان الفرعي الأنيق' : 'Decorative Secondary Subheader'"></span></h2>
+                                        <p class="text-gray-400 font-light" :style="`font-size: 14px`"><span x-text="isArabic ? 'النص التوضيحي المكتوب بخط التجوال المريح.' : 'This is standard paragraph body scale in perfect ratio.'"></span></p>
+                                    </div>
+                                    <div class="space-y-3">
+                                        <div class="flex justify-between text-xs text-gray-400 font-bold">
+                                            <span x-text="isArabic ? 'معدل التدرج الحالي:' : 'Current Scale factor:'"></span>
+                                            <span class="text-bronze" x-text="typographyScale"></span>
+                                        </div>
+                                        <input type="range" min="1" max="2.5" step="0.01" x-model="typographyScale" class="w-full">
+                                        <div class="text-center text-[10px] text-gray-500" x-text="isArabic ? 'الهدف هو النسبة الذهبية للتباعد البصري (1.618)' : 'Goal is mathematical golden scale matching (1.618)'"></div>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <!-- GAME 3: Visual Gravity Balance -->
+                            <template x-if="currentEliteGameIndex === 2">
+                                <div class="space-y-8 w-full max-w-lg mx-auto">
+                                    <div class="w-full aspect-[2/1] bg-black/60 rounded-xl relative overflow-hidden flex items-end justify-center p-6 border border-white/5">
+                                        <!-- SVG Balance Beam -->
+                                        <svg class="w-full h-full overflow-visible" viewBox="0 0 400 200">
+                                            <!-- Center Pivot -->
+                                            <polygon points="200,160 185,190 215,190" fill="#C5A059" />
+                                            <!-- Beam -->
+                                            <line x1="50" y1="160" x2="350" y2="160" stroke="#EAEAEA" stroke-width="4" :style="`transform: rotate(${(visualGravityVal - 62) * 0.4}deg); transform-origin: 200px 160px; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);`" />
+                                            <!-- Heavy Left Block -->
+                                            <rect x="70" y="100" width="50" height="50" fill="#EAEAEA" rx="5" :style="`transform: rotate(${(visualGravityVal - 62) * 0.4}deg); transform-origin: 200px 160px; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);`" />
+                                            <!-- Adjustable Right Circle (Bronze) -->
+                                            <circle :cx="350 - (100 - visualGravityVal) * 2" cy="135" r="25" fill="#C5A059" :style="`transform: rotate(${(visualGravityVal - 62) * 0.4}deg); transform-origin: 200px 160px; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);`" />
+                                        </svg>
+                                    </div>
+                                    <div class="space-y-3">
+                                        <div class="flex justify-between text-xs text-gray-400 font-bold">
+                                            <span x-text="isArabic ? 'موقع الثقل البصري للرمز:' : 'Visual Symbol offset:'"></span>
+                                            <span class="text-bronze" x-text="visualGravityVal"></span>
+                                        </div>
+                                        <input type="range" min="10" max="95" x-model="visualGravityVal" class="w-full">
+                                    </div>
+                                </div>
+                            </template>
+
+                            <!-- GAME 4: WCAG Contrast Matcher -->
+                            <template x-if="currentEliteGameIndex === 3">
+                                <div class="space-y-8 w-full max-w-lg mx-auto">
+                                    <!-- Contrast Preview Card -->
+                                    <div class="w-full p-8 rounded-xl text-center relative flex flex-col justify-center items-center" :style="`background-color: #1A1A1A;`">
+                                        <h4 class="amiri-title text-3xl font-extrabold mb-2" :style="`color: rgb(${contrastValue}, ${contrastValue}, ${contrastValue})`">Fodil Kerchani</h4>
+                                        <p class="text-xs" :style="`color: rgb(${contrastValue}, ${contrastValue}, ${contrastValue})`">High definition cinematic copy readability test.</p>
+                                        
+                                        <div class="mt-6 px-4 py-1.5 rounded-full bg-black/60 border border-[#C5A059]/20 text-xs text-bronze font-bold">
+                                            WCAG Ratio: <span class="text-white font-extrabold" x-text="(Math.round(((255 - contrastValue) / 10 + 1) * 10) / 10) + ':1'"></span>
+                                        </div>
+                                    </div>
+                                    <div class="space-y-3">
+                                        <div class="flex justify-between text-xs text-gray-400 font-bold">
+                                            <span x-text="isArabic ? 'سطوع خط النص:' : 'Text brightness:'"></span>
+                                            <span class="text-bronze" x-text="contrastValue"></span>
+                                        </div>
+                                        <input type="range" min="0" max="255" x-model="contrastValue" class="w-full">
+                                        <div class="text-center text-[10px] text-gray-500" x-text="isArabic ? 'الهدف هو مطابقة نسبة التباين لتكون 7.0:1 بالضبط' : 'Target is to achieve exactly 7.0:1 WCAG AAA standard contrast ratio'"></div>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <!-- GAME 5: Golden Ratio Cropper -->
+                            <template x-if="currentEliteGameIndex === 4">
+                                <div class="space-y-8 w-full max-w-lg mx-auto">
+                                    <div class="w-full aspect-[1.8/1] bg-black/80 rounded-xl relative overflow-hidden flex items-center justify-center p-6 border border-white/5">
+                                        <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600" class="absolute inset-0 w-full h-full object-cover opacity-20">
+                                        <!-- Resizable Crop overlay -->
+                                        <div class="border-2 border-dashed border-bronze-solid rounded shadow-[0_0_20px_rgba(197,160,89,0.3)] bg-bronze/5 flex items-center justify-center text-xs text-bronze font-bold" :style="`width: ${cropWidth * 1.5}px; height: 120px; transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);`">
+                                            Ratio: <span class="text-white ml-1" x-text="(Math.round((cropWidth / 120) * 100) / 100)"></span>
+                                        </div>
+                                    </div>
+                                    <div class="space-y-3">
+                                        <div class="flex justify-between text-xs text-gray-400 font-bold">
+                                            <span x-text="isArabic ? 'عرض إطار النسبة الذهبية:' : 'Crop box width scale:'"></span>
+                                            <span class="text-bronze" x-text="cropWidth"></span>
+                                        </div>
+                                        <input type="range" min="100" max="300" x-model="cropWidth" class="w-full">
+                                        <div class="text-center text-[10px] text-gray-500" x-text="isArabic ? 'اضبط العرض لتطابق النسبة الذهبية 1.618 بالضبط مقارنة بالارتفاع (120)' : 'Match Golden Ratio width value (1.618 * 120px = ~194px)'"></div>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <!-- GAME 6: 12-Column Grid Snapper -->
+                            <template x-if="currentEliteGameIndex === 5">
+                                <div class="space-y-8 w-full max-w-xl mx-auto">
+                                    <div class="w-full min-h-[160px] bg-black/60 rounded-xl relative p-4 flex flex-col justify-center border border-white/5">
+                                        <!-- Grid Columns Background overlay -->
+                                        <div class="absolute inset-0 p-4 grid grid-cols-12 gap-2 opacity-10">
+                                            <template x-for="n in 12">
+                                                <div class="bg-white h-full rounded"></div>
+                                            </template>
+                                        </div>
+                                        
+                                        <!-- Grid element -->
+                                        <div class="relative z-10 flex gap-4 w-full px-4">
+                                            <div class="h-16 bg-[#1A1A1A] border border-white/10 rounded-xl flex items-center justify-center text-xs text-gray-400" :style="`width: ${(100 - gridSnapVal) * 0.4}%;`"><span x-text="isArabic ? 'عنصر جانبي' : 'Sidebar'"></span></div>
+                                            <div class="h-16 bg-bronze/10 border border-bronze-solid rounded-xl flex items-center justify-center text-xs text-bronze font-bold" :style="`width: ${gridSnapVal * 0.6}%; transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);`"><span x-text="isArabic ? 'المحتوى الرئيسي' : 'Grid Span'"></span></div>
+                                        </div>
+                                    </div>
+                                    <div class="space-y-3">
+                                        <div class="flex justify-between text-xs text-gray-400 font-bold">
+                                            <span x-text="isArabic ? 'قيمة العرض المئوية:' : 'Main block span percentage:'"></span>
+                                            <span class="text-bronze" x-text="gridSnapVal + '%'"></span>
+                                        </div>
+                                        <input type="range" min="30" max="95" x-model="gridSnapVal" class="w-full">
+                                        <div class="text-center text-[10px] text-gray-500" x-text="isArabic ? 'اضبط عرض الكتلة البرونزية لتقطع 8 أعمدة تماماً من أصل 12 (ما يعادل 66.6% بحد ذاتها)' : 'Perfectly snap main block to occupy exactly 8 columns (66% target)'"></div>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <!-- GAME 7: Optical Padding Equalizer -->
+                            <template x-if="currentEliteGameIndex === 6">
+                                <div class="space-y-8 w-full max-w-lg mx-auto">
+                                    <div class="w-full min-h-[220px] bg-black/60 rounded-xl flex items-center justify-center p-6 border border-white/5">
+                                        <!-- Adjusting Button -->
+                                        <button class="bg-[#1E1E1E] border border-bronze-solid rounded-xl font-bold text-white shadow-lg transition-all" :style="`padding-top: ${opticalPaddingTB}px; padding-bottom: ${80 - opticalPaddingTB}px; padding-left: ${opticalPaddingLR}px; padding-right: ${100 - opticalPaddingLR}px;`">
+                                            <span class="amiri-title text-xl text-bronze"><span x-text="isArabic ? 'توازن الهامش' : 'Button Content'"></span></span>
+                                        </button>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div class="space-y-2">
+                                            <div class="flex justify-between text-xs text-gray-400 font-bold">
+                                                <span x-text="isArabic ? 'الهامش العلوي:' : 'Top Padding:'"></span>
+                                                <span class="text-bronze" x-text="opticalPaddingTB + 'px'"></span>
+                                            </div>
+                                            <input type="range" min="10" max="70" x-model="opticalPaddingTB" class="w-full">
+                                        </div>
+                                        <div class="space-y-2">
+                                            <div class="flex justify-between text-xs text-gray-400 font-bold">
+                                                <span x-text="isArabic ? 'الهامش الأيسر:' : 'Left Padding:'"></span>
+                                                <span class="text-bronze" x-text="opticalPaddingLR + 'px'"></span>
+                                            </div>
+                                            <input type="range" min="20" max="80" x-model="opticalPaddingLR" class="w-full">
+                                        </div>
+                                    </div>
+                                    <div class="text-center text-[10px] text-gray-500" x-text="isArabic ? 'اضبط الهوامش لتكون متطابقة بصرياً على جميع الجهات (الهدف: 40px للأعلى/الأسفل و 50px لليمين/اليسار)' : 'Match optical symmetry balance (Goal: 40px top-bottom, 50px left-right)'"></div>
+                                </div>
+                            </template>
+
+                            <!-- GAME 8: Asymmetrical Balance Scale -->
+                            <template x-if="currentEliteGameIndex === 7">
+                                <div class="space-y-8 w-full max-w-xl mx-auto">
+                                    <div class="w-full min-h-[220px] bg-black/60 rounded-xl relative p-6 border border-white/5 flex items-center justify-between">
+                                        <!-- Heavy conceptual visual block -->
+                                        <div class="w-40 h-32 rounded-xl bg-gradient-to-br from-[#1A1A1A] to-[#252525] border border-white/10 flex flex-col justify-center items-center p-4">
+                                            <span class="text-3xl text-gray-500">🧬</span>
+                                            <span class="text-[10px] text-gray-500 mt-2">Heavy Bio-Art Canvas</span>
+                                        </div>
+                                        
+                                        <!-- Adjustable lighter interactive bronze circle -->
+                                        <div class="rounded-full bg-bronze text-black font-extrabold flex items-center justify-center shadow-2xl transition-all" :style="`width: ${asymScale}px; height: ${asymScale}px; margin-right: ${(140 - asymScale) * 0.8}px;`">
+                                            🏆
+                                        </div>
+                                    </div>
+                                    <div class="space-y-3">
+                                        <div class="flex justify-between text-xs text-gray-400 font-bold">
+                                            <span x-text="isArabic ? 'حجم كتلة الإبراز الموازنة:' : 'Accent highlight size scale:'"></span>
+                                            <span class="text-bronze" x-text="asymScale + 'px'"></span>
+                                        </div>
+                                        <input type="range" min="40" max="140" x-model="asymScale" class="w-full">
+                                        <div class="text-center text-[10px] text-gray-500" x-text="isArabic ? 'اضبط حجم الكتلة الذهبية لتوازن الكتلة الداكنة بصرياً دون تماثل هندسي (حجم مثالي موازن: 80px)' : 'Tune bronze circle scale to visually equate heavy canvas weight (ideal offset target: 80px)'"></div>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <!-- GAME 9: Line Height Spacing Match -->
+                            <template x-if="currentEliteGameIndex === 8">
+                                <div class="space-y-8 w-full max-w-lg mx-auto">
+                                    <div class="w-full p-6 bg-black/60 rounded-xl border border-white/5">
+                                        <!-- Readability text block -->
+                                        <p class="amiri-title text-gray-200 text-lg leading-normal text-justify" :style="`line-height: ${lineHeightVal};`">
+                                            <span x-show="isArabic">إن الخطوط العربية تنفرد بهيكلية هندسية بالغة الفخامة والتعقيد. إن ضبط تباعد الأسطر التيبوغرافي لا يعد ترفاً جمالياً، بل هو عامل أساسي لراحة العين وتسهيل القراءة وتوجيه الفكر لامتصاص المعرفة بنقاوة كاملة.</span>
+                                            <span x-show="!isArabic">Traditional Arabic typography excels in elegant complex structures. Tuning structural spacing of text parameters is a core usability standard. It reduces visual tension and improves layout elegance.</span>
+                                        </p>
+                                    </div>
+                                    <div class="space-y-3">
+                                        <div class="flex justify-between text-xs text-gray-400 font-bold">
+                                            <span x-text="isArabic ? 'معدل التباعد الحالي:' : 'Current Line Height:'"></span>
+                                            <span class="text-bronze" x-text="lineHeightVal"></span>
+                                        </div>
+                                        <input type="range" min="0.8" max="2.6" step="0.05" x-model="lineHeightVal" class="w-full">
+                                        <div class="text-center text-[10px] text-gray-500" x-text="isArabic ? 'اضبط المنزلق للمقاس الطباعي المعياري (1.6)' : 'Match optimal Arabic layout spacing (Standard goal: 1.6)'"></div>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <!-- GAME 10: Bezier Logo Curve Match -->
+                            <template x-if="currentEliteGameIndex === 9">
+                                <div class="space-y-8 w-full max-w-lg mx-auto">
+                                    <div class="w-full aspect-[2/1] bg-black/80 rounded-xl relative overflow-hidden flex items-center justify-center p-6 border border-white/5">
+                                        <svg class="w-full h-full" viewBox="0 0 300 150">
+                                            <!-- Target Curve (Glowing bronze outline) -->
+                                            <path d="M 50 120 Q 150 10 250 120" fill="none" stroke="#C5A059" stroke-width="4" stroke-linecap="round" opacity="0.3" />
+                                            <!-- Active Curve (Adjustable) -->
+                                            <path d="M 50 120 Q 150 10 250 120" fill="none" stroke="#C5A059" :stroke-width="2 + (Math.abs(bezierCurveVal - 10) / 10)" :d="`M 50 120 Q 150 ${bezierCurveVal} 250 120`" stroke-linecap="round" class="drop-shadow-[0_0_10px_#C5A059]" />
+                                            <!-- Handle indicator -->
+                                            <circle cx="150" :cy="bezierCurveVal" r="6" fill="#FFFFFF" />
+                                        </svg>
+                                    </div>
+                                    <div class="space-y-3">
+                                        <div class="flex justify-between text-xs text-gray-400 font-bold">
+                                            <span x-text="isArabic ? 'عمق الانحناء لمتجه بيزييه:' : 'Bezier curve anchor depth:'"></span>
+                                            <span class="text-bronze" x-text="bezierCurveVal"></span>
+                                        </div>
+                                        <input type="range" min="10" max="130" x-model="bezierCurveVal" class="w-full">
+                                        <div class="text-center text-[10px] text-gray-500" x-text="isArabic ? 'اضبط المقبض ليتطابق مع القوس الأصلي المخفي (العمق المستهدف: 10)' : 'Overlap curve with the target layout path (ideal depth: 10)'"></div>
+                                    </div>
+                                </div>
+                            </template>
+
+                        </div>
+
+                        <!-- Right Sidebar Evaluation Controls -->
+                        <div class="lg:col-span-4 flex flex-col justify-between space-y-6">
+                            <div :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10' : 'bg-white border-[#C5A059]/20 shadow-md'" class="p-6 space-y-4 rounded-[20px] border">
+                                <h3 class="amiri-title text-3xl font-black text-bronze" x-text="isArabic ? activeEliteGame.titleAr : activeEliteGame.titleEn"></h3>
+                                <p class="text-xs leading-relaxed text-gray-400" :class="darkMode ? 'text-gray-300' : 'text-gray-700'" x-text="isArabic ? activeEliteGame.questionAr : activeEliteGame.questionEn"></p>
+                            </div>
+                            
+                            <!-- Competitive Score Evaluation Dashboard -->
+                            <div class="space-y-4">
+                                <button @click="submitEliteGameScore()" class="w-full py-4 rounded-full font-bold text-sm bg-bronze text-black shadow-lg hover:bg-white hover:scale-[1.02] transition">
+                                    <span x-text="isArabic ? 'احسب نتيجة المطابقة البصرية' : 'Validate Visual Score'"></span>
+                                </button>
+                                
+                                <div :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10' : 'bg-white border-gray-200 shadow-sm'" class="p-4 text-center rounded-[20px] border">
+                                    <div class="text-xs text-gray-400 mb-1" x-text="isArabic ? 'نتيجتك التنافسية في هذه اللعبة' : 'Current Challenge Score'"></div>
+                                    <div class="text-4xl font-black text-bronze"><span x-text="eliteScore"></span> / 100</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </template>
+            </div>
+            
+        </div>
+
+        <!-- ================= 4. ACADEMIC INTERACTIVE KNOWLEDGE HUB ================= -->
+        <div x-show="currentPage === 'knowledge'" class="page-fade space-y-12" style="display: none;">
+            
+            <div class="text-center space-y-4 mb-10">
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-[#C5A059]/10 text-bronze text-xs font-bold uppercase tracking-widest border border-[#C5A059]/20">
+                    📚 Interactive Knowledge Hub
+                </div>
+                <h2 class="amiri-title text-5xl font-black" :class="darkMode ? 'text-white' : 'text-black'" x-text="isArabic ? 'الموسوعة الأكاديمية التفاعلية' : 'Cinematic Knowledge Hub'"></h2>
+                <p class="text-sm max-w-xl mx-auto" :class="darkMode ? 'text-gray-400' : 'text-gray-600'" x-text="isArabic ? 'مرجع أكاديمي متكامل مستوحى من كبرى المنصات العالمية التعليمية لتلخيص قواعد التصميم دون أي روابط خارجية تشتت فكرك.' : 'A visually immersive learning hub outlining fundamental design guidelines without distracting external links.'"></p>
+            </div>
+
+            <!-- Knowledge Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                
+                <!-- CARD 1: TYPOGRAPHY (Google Fonts Knowledge inspired) -->
+                <div 
+                    :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10 hover:border-[#C5A059]/30' : 'bg-white/90 border-[#C5A059]/25 hover:border-bronze-solid shadow-lg'" 
+                    class="p-8 flex flex-col justify-between rounded-[20px] border transition-all duration-300 group hover:-translate-y-1 border-l-4 border-l-[#C5A059]">
+                    <div class="space-y-6">
+                        <div class="w-full h-44 rounded-xl bg-gradient-to-br from-[#1E1E1E] to-black border border-white/5 flex items-center justify-center text-4xl text-bronze shadow-inner relative overflow-hidden">
+                            <div class="absolute -right-10 -bottom-10 opacity-5 playfair-title text-9xl">A</div>
+                            ع
+                        </div>
+                        <div class="space-y-3">
+                            <h3 class="amiri-title text-2xl font-extrabold flex justify-between items-center" :class="darkMode ? 'text-white' : 'text-black'">
+                                <span x-text="isArabic ? 'أساسيات التايبوغرافي' : 'Typography Basics'"></span>
+                                <span class="text-[10px] bg-[#C5A059]/10 text-bronze px-2 py-0.5 rounded">Google Fonts</span>
+                            </h3>
+                            <p class="text-sm leading-relaxed text-justify" :class="darkMode ? 'text-gray-300' : 'text-gray-700'">
+                                <span x-show="isArabic">
+                                    <strong>1. التراتب الهرمي (Hierarchy):</strong> ترتيب العناصر بحسب الأهمية بتكبير العناوين الكبرى وتخفيف الأوزان تدريجياً لتوجيه القارئ تلقائياً.<br><br>
+                                    <strong>2. التباعد السطري المريح (Spacing):</strong> المقروئية تتطلب طول أسطر يتراوح بين 50-75 حرفاً في السطر كحد أقصى، مع ارتفاع سطر (Line Height) بمعدل 1.5 لتجنب إرهاق العين.
+                                </span>
+                                <span x-show="!isArabic">
+                                    <strong>1. Hierarchy & Contrast:</strong> Guiding user path via sizes and font weights.<br><br>
+                                    <strong>2. Spacing & Readability:</strong> Restrict lines to 50-75 characters. Establish standard 1.5 line height metrics for comfortable long reading loops.
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="mt-8 pt-4 border-t border-white/5 flex justify-between items-center text-xs text-bronze font-bold">
+                        <span x-text="isArabic ? 'مفهوم القراءة المريحة' : 'Optimal readability standards'"></span>
+                        <span>Tajawal / Amiri</span>
+                    </div>
+                </div>
+
+                <!-- CARD 2: UX PSYCHOLOGY (IxDF & NNGroup inspired) -->
+                <div 
+                    :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10 hover:border-[#C5A059]/30' : 'bg-white/90 border-[#C5A059]/25 hover:border-bronze-solid shadow-lg'" 
+                    class="p-8 flex flex-col justify-between rounded-[20px] border transition-all duration-300 group hover:-translate-y-1 border-l-4 border-l-[#C5A059]">
+                    <div class="space-y-6">
+                        <div class="w-full h-44 rounded-xl bg-gradient-to-br from-[#1E1E1E] to-black border border-white/5 flex items-center justify-center text-4xl text-bronze shadow-inner relative overflow-hidden">
+                            <div class="absolute -right-10 -bottom-10 opacity-5 text-9xl">🧠</div>
+                            UX
+                        </div>
+                        <div class="space-y-3">
+                            <h3 class="amiri-title text-2xl font-extrabold flex justify-between items-center" :class="darkMode ? 'text-white' : 'text-black'">
+                                <span x-text="isArabic ? 'سيكولوجية تجربة المستخدم' : 'UX & Color Psychology'"></span>
+                                <span class="text-[10px] bg-[#C5A059]/10 text-bronze px-2 py-0.5 rounded">NNGroup / IxDF</span>
+                            </h3>
+                            <p class="text-sm leading-relaxed text-justify" :class="darkMode ? 'text-gray-300' : 'text-gray-700'">
+                                <span x-show="isArabic">
+                                    <strong>1. قانون هيك (Hick\'s Law):</strong> يزداد وقت اتخاذ القرار مع زيادة عدد الخيارات وصعوبتها. لذا، بسّط الواجهات وحافظ على مساحات سلبية واسعة.<br><br>
+                                    <strong>2. قانون جاكوب (Jakob\'s Law):</strong> يفضل المستخدمون أن تعمل منصتك بنفس الطريقة المألوفة للمنصات الأخرى. لا تخترع هياكل تزيد العبء الإدراكي.
+                                </span>
+                                <span x-show="!isArabic">
+                                    <strong>1. Hick\'s Law:</strong> Decision complexity increases with option quantity. Simplify cognitive parameters.<br><br>
+                                    <strong>2. Jakob\'s Law:</strong> Users prefer predictable visual behaviors. Stick to standard navigation loops.
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="mt-8 pt-4 border-t border-white/5 flex justify-between items-center text-xs text-bronze font-bold">
+                        <span x-text="isArabic ? 'تقليل العبء الإدراكي' : 'Reducing cognitive load'"></span>
+                        <span>Hick\'s / Jakob\'s Laws</span>
+                    </div>
+                </div>
+
+                <!-- CARD 3: ADVANCED WORKFLOWS (Adobe Discover inspired) -->
+                <div 
+                    :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10 hover:border-[#C5A059]/30' : 'bg-white/90 border-[#C5A059]/25 hover:border-bronze-solid shadow-lg'" 
+                    class="p-8 flex flex-col justify-between rounded-[20px] border transition-all duration-300 group hover:-translate-y-1 border-l-4 border-l-[#C5A059]">
+                    <div class="space-y-6">
+                        <div class="w-full h-44 rounded-xl bg-gradient-to-br from-[#1E1E1E] to-black border border-white/5 flex items-center justify-center text-4xl text-bronze shadow-inner relative overflow-hidden">
+                            <div class="absolute -right-10 -bottom-10 opacity-5 text-9xl">⚙️</div>
+                            AI
+                        </div>
+                        <div class="space-y-3">
+                            <h3 class="amiri-title text-2xl font-extrabold flex justify-between items-center" :class="darkMode ? 'text-white' : 'text-black'">
+                                <span x-text="isArabic ? 'سير العمل الذكي والذكاء الاصطناعي' : 'AI & Smart Workflows'"></span>
+                                <span class="text-[10px] bg-[#C5A059]/10 text-bronze px-2 py-0.5 rounded">Adobe Discover</span>
+                            </h3>
+                            <p class="text-sm leading-relaxed text-justify" :class="darkMode ? 'text-gray-300' : 'text-gray-700'">
+                                <span x-show="isArabic">
+                                    <strong>1. تسريع العصف الذهني:</strong> توظيف الذكاء الاصطناعي التوليدي لإنشاء لوحات الإلهام (Moodboards) والمفاهيم الأولية الفاخرة بسرعة فائقة.<br><br>
+                                    <strong>2. دمج الأصول السينمائية:</strong> الاستفادة من الأدوات في دمج أصول الصور ثلاثية الأبعاد والألوان التوليدية لبناء تصاميم نادرة وتنافسية.
+                                </span>
+                                <span x-show="!isArabic">
+                                    <strong>1. Rapid Ideation:</strong> Employ generative model assets to compile moodboards quickly.<br><br>
+                                    <strong>2. Hybrid Assets:</strong> Merge Blender models, vector shapes, and AI graphics into unified luxury visuals.
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="mt-8 pt-4 border-t border-white/5 flex justify-between items-center text-xs text-bronze font-bold">
+                        <span x-text="isArabic ? 'التصميم المدعوم بالذكاء الاصطناعي' : 'AI-augmented layout generation'"></span>
+                        <span>Midjourney / Blender</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ================= 5. PRO GAMES: ADVANCED INTERACTIVE GAME TOOLS ================= -->
+        <div x-show="currentPage === 'pro_tools'" class="page-fade space-y-12" style="display: none;">
+            
+            <div class="text-center space-y-4 mb-10">
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-[#C5A059]/10 text-bronze text-xs font-bold uppercase tracking-widest border border-[#C5A059]/20">
+                    ⚙️ Advanced Tools
+                </div>
+                <h2 class="amiri-title text-5xl font-black" :class="darkMode ? 'text-white' : 'text-black'" x-text="isArabic ? 'ألعاب التصميم التفاعلية للمحترفين' : 'Advanced Pro Interactive Games'"></h2>
+                <p class="text-sm max-w-xl mx-auto" :class="darkMode ? 'text-gray-400' : 'text-gray-600'" x-text="isArabic ? 'تحديات تفاعلية متقدمة تختبر مهاراتك الدقيقة في استخدام أداة القلم والمسافات والانسجام اللوني.' : 'Interact with high-fidelity vector tools, kerning metrics, and chromatic harmony charts to elevate your absolute mastery.'"></p>
+            </div>
+
+            <!-- Three Pro Tools -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- 1. Pen Tool Curve game -->
+                <div :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10' : 'bg-white border-[#C5A059]/20 shadow-md'" class="p-8 space-y-6 rounded-[20px] border">
+                    <div class="w-full h-40 bg-black/60 rounded-xl flex items-center justify-center border border-white/5 relative overflow-hidden">
+                        <!-- SVG Display -->
+                        <svg class="w-full h-full" viewBox="0 0 200 100">
+                            <path d="M 20 80 C 50 10, 150 10, 180 80" fill="none" stroke="#C5A059" stroke-width="3" />
+                            <circle cx="95" cy="45" r="5" fill="#FFFFFF" />
+                        </svg>
+                    </div>
+                    <div class="space-y-2">
+                        <h3 class="amiri-title text-2xl font-bold text-white" :class="darkMode ? 'text-white' : 'text-black'" x-text="isArabic ? 'لعبة أداة القلم (Bezier)' : 'Pen Tool Vector Challenge'"></h3>
+                        <p class="text-xs text-gray-400 leading-relaxed font-light" x-text="isArabic ? 'تحكّم بنقاط ومقابض متجهات بيزييه لبناء خطوط انسيابية دقيقة كأنك تصمم شعاراً احترافياً.' : 'Tweak vector anchors and handle depths in order to overlap sleek custom curves perfectly.'"></p>
+                    </div>
+                    <button @click="currentPage = 'elite'; selectEliteGame(9)" class="w-full py-3 rounded-full bg-bronze text-black font-extrabold text-xs" x-text="isArabic ? 'ابدأ اللعبة الآن' : 'Launch Vector Game'"></button>
+                </div>
+
+                <!-- 2. Kerning Type game -->
+                <div :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10' : 'bg-white border-[#C5A059]/20 shadow-md'" class="p-8 space-y-6 rounded-[20px] border">
+                    <div class="w-full h-40 bg-black/60 rounded-xl flex items-center justify-center border border-white/5">
+                        <h4 class="playfair-title text-4xl font-extrabold tracking-[15px] text-white">D E S I G N</h4>
+                    </div>
+                    <div class="space-y-2">
+                        <h3 class="amiri-title text-2xl font-bold text-white" :class="darkMode ? 'text-white' : 'text-black'" x-text="isArabic ? 'لعبة المسافات بين الحروف (Kerning)' : 'KernType Typography Spacing'"></h3>
+                        <p class="text-xs text-gray-400 leading-relaxed font-light" x-text="isArabic ? 'اضبط التباعد والمسافة البصرية بين الحروف بدقة متناهية لتحصل على أقصى درجات المقروئية.' : 'Move individual characters horizontally to establish optically balanced microtypography spacing.'"></p>
+                    </div>
+                    <button @click="currentPage = 'elite'; selectEliteGame(1)" class="w-full py-3 rounded-full bg-bronze text-black font-extrabold text-xs" x-text="isArabic ? 'ابدأ اللعبة الآن' : 'Launch Kerning Game'"></button>
+                </div>
+
+                <!-- 3. Color Harmony game -->
+                <div :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10' : 'bg-white border-[#C5A059]/20 shadow-md'" class="p-8 space-y-6 rounded-[20px] border">
+                    <div class="w-full h-40 bg-black/60 rounded-xl flex items-center justify-center border border-white/5 relative">
+                        <!-- Color Harmony grid -->
+                        <div class="w-24 h-24 rounded-full border-4 border-bronze flex items-center justify-center relative bg-gradient-to-tr from-red-500 via-green-500 to-blue-500">
+                            <div class="w-2 h-2 rounded-full bg-white absolute top-4 left-4"></div>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <h3 class="amiri-title text-2xl font-bold text-white" :class="darkMode ? 'text-white' : 'text-black'" x-text="isArabic ? 'لعبة التناسق اللوني' : 'Color Harmony Palette Maker'"></h3>
+                        <p class="text-xs text-gray-400 leading-relaxed font-light" x-text="isArabic ? 'اختبر قدرتك على استنباط الألوان المتكاملة والثنائية لبناء هوية تجارية ممتازة.' : 'Locate precise complementary tones to equate a given brand aesthetic perfectly.'"></p>
+                    </div>
+                    <button @click="currentPage = 'elite'; selectEliteGame(0)" class="w-full py-3 rounded-full bg-bronze text-black font-extrabold text-xs" x-text="isArabic ? 'ابدأ اللعبة الآن' : 'Launch Palette Game'"></button>
+                </div>
+            </div>
+
+            <!-- Workflow Lessons (سير العمل المتقدم والتكنولوجيا) -->
+            <div class="space-y-8">
+                <h3 class="amiri-title text-3xl font-black" :class="darkMode ? 'text-white' : 'text-[#1E1E1E]'" x-text="isArabic ? 'مناهج سير العمل والتقنيات (Workflows)' : 'Advanced Cinematic Workflows'"></h3>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10' : 'bg-white border-[#C5A059]/20 shadow-sm'" class="p-6 space-y-3 rounded-[20px] border">
+                        <span class="text-2xl">🤖</span>
+                        <h4 class="font-bold text-md" :class="darkMode ? 'text-white' : 'text-black'" x-text="isArabic ? 'الذكاء الاصطناعي التوليدي' : 'Generative AI Concepts'"></h4>
+                        <p class="text-[11px] leading-relaxed" :class="darkMode ? 'text-gray-400' : 'text-gray-600'" x-text="isArabic ? 'كيفية دمج مخرجات Midjourney و Stable Diffusion في تصاميم الدمج الرقمي السينمائي.' : 'Integrate AI visual assets smoothly into layout design structures.'"></p>
+                    </div>
+                    <div :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10' : 'bg-white border-[#C5A059]/20 shadow-sm'" class="p-6 space-y-3 rounded-[20px] border">
+                        <span class="text-2xl">🧊</span>
+                        <h4 class="font-bold text-md" :class="darkMode ? 'text-white' : 'text-black'" x-text="isArabic ? 'البعد الثالث والـ 3D' : 'Blender 3D Modeling'"></h4>
+                        <p class="text-[11px] leading-relaxed" :class="darkMode ? 'text-gray-400' : 'text-gray-600'" x-text="isArabic ? 'بناء عناصر Bio-Art مجسمة ونمذجة سيارات ثلاثية الأبعاد ببرنامج Blender ودمجها بانسجام.' : 'Construct organic and architectural forms and merge them inside layouts.'"></p>
+                    </div>
+                    <div :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10' : 'bg-white border-[#C5A059]/20 shadow-sm'" class="p-6 space-y-3 rounded-[20px] border">
+                        <span class="text-2xl">🎞️</span>
+                        <h4 class="font-bold text-md" :class="darkMode ? 'text-white' : 'text-black'" x-text="isArabic ? 'المونتاج بـ Premiere Pro' : 'Adobe Premiere Workflows'"></h4>
+                        <p class="text-[11px] leading-relaxed" :class="darkMode ? 'text-gray-400' : 'text-gray-600'" x-text="isArabic ? 'الترتيب الإيقاعي البصري، وتنسيق تدفق اللقطات، ودمج الهوية البصرية داخل الفيديو.' : 'Maintain absolute grid alignment and color precision across video edits.'"></p>
+                    </div>
+                    <div :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10' : 'bg-white border-[#C5A059]/20 shadow-sm'" class="p-6 space-y-3 rounded-[20px] border">
+                        <span class="text-2xl">🎨</span>
+                        <h4 class="font-bold text-md" :class="darkMode ? 'text-white' : 'text-black'" x-text="isArabic ? 'تلوين بـ DaVinci Resolve' : 'DaVinci Resolve Color Grading'"></h4>
+                        <p class="text-[11px] leading-relaxed" :class="darkMode ? 'text-gray-400' : 'text-gray-600'" x-text="isArabic ? 'سير عمل الألوان الاحترافي ونظرية تباين الألوان السينمائية (Chiaroscuro) للحصول على جودة مبهرة.' : 'Professional color theory workflows and lighting contrasts for luxury outputs.'"></p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ================= 6. BEHANCE FEATURED PROJECTS GRID (10 ORIGINAL PROJECTS) ================= -->
+        <div x-show="currentPage === 'portfolio'" class="page-fade space-y-8" style="display: none;">
+            
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-[#C5A059]/10 pb-6 gap-4">
+                <div class="space-y-2">
+                    <h2 class="amiri-title text-4xl font-black flex items-center gap-3" :class="darkMode ? 'text-white' : 'text-black'">
+                        <span class="bg-[#C5A059]/15 p-2 rounded-xl text-bronze">🎨</span>
+                        <span x-text="isArabic ? 'المعرض الفني للمشاريع الأصلية' : 'Genuine Design Portfolio'"></span>
+                    </h2>
+                    <p class="text-sm text-gray-400" x-text="isArabic ? '10 مشاريع حقيقية وشعارات تجارية حصرية عمل عليها المصمم Fodil Kerchani' : '10 original professional identity and brand design projects completed by Fodil Kerchani'"></p>
+                </div>
+                <a href="https://www.behance.net/fodilart03" target="_blank" class="px-6 py-3 rounded-full bg-bronze text-black font-extrabold text-xs shadow-md hover:bg-white hover:text-black transition uppercase tracking-wider">
+                    Behance Profile &rarr;
+                </a>
+            </div>
+
+            <p class="text-xs text-gray-400" x-text="isArabic ? 'اضغط على أي مشروع لمشاهدة تفاصيله الكاملة والـ Mockups الأصلية مباشرة على Behance:' : 'Click any catalog card to inspect high-definition mockups and details directly on Behance:'"></p>
+
+            <!-- Grid of 10 original projects -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                
+                <!-- Project 1: POSTER DESIGN -->
+                <a href="https://www.behance.net/gallery/233469777/POSTER-DESIGN" target="_blank" :class="darkMode ? 'border-white/5' : 'border-gray-200 shadow-md'" class="glass-card group relative rounded-xl overflow-hidden aspect-[4/5] block border hover:border-bronze-solid hover:shadow-[0_0_20px_rgba(197,160,89,0.3)] transition duration-300">
+                    <img src="https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/7d740c233469777.Y3JvcCwzMTg2LDI0OTIsMCwzMQ.png" class="absolute inset-0 w-full h-full object-cover transition duration-500 group-hover:scale-105 opacity-80 group-hover:opacity-100">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4 translate-y-2 group-hover:translate-y-0 transition">
+                        <h3 class="font-bold text-white text-sm mb-0.5">POSTER DESIGN</h3>
+                        <p class="text-[10px] text-bronze uppercase tracking-widest" x-text="isArabic ? 'تصميم ملصقات' : 'Poster Concepts'"></p>
+                    </div>
+                </a>
+
+                <!-- Project 2: وقت الشاي TEA time -->
+                <a href="https://www.behance.net/gallery/232835001/-TEA-time" target="_blank" :class="darkMode ? 'border-white/5' : 'border-gray-200 shadow-md'" class="glass-card group relative rounded-xl overflow-hidden aspect-[4/5] block border hover:border-bronze-solid hover:shadow-[0_0_20px_rgba(197,160,89,0.3)] transition duration-300">
+                    <img src="https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/295a5e232835001.Y3JvcCwxMTUwNiw5MDAwLDI1Niww.png" class="absolute inset-0 w-full h-full object-cover transition duration-500 group-hover:scale-105 opacity-80 group-hover:opacity-100">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4 translate-y-2 group-hover:translate-y-0 transition">
+                        <h3 class="font-bold text-white text-sm mb-0.5">وقت الشاي - TEA Time</h3>
+                        <p class="text-[10px] text-bronze uppercase tracking-widest" x-text="isArabic ? 'شعار وهوية بصرية' : 'Brand & Identity'"></p>
+                    </div>
+                </a>
+
+                <!-- Project 3: TRIAL BLAZE -->
+                <a href="https://www.behance.net/gallery/232822349/TRIAL-BLAZE" target="_blank" :class="darkMode ? 'border-white/5' : 'border-gray-200 shadow-md'" class="glass-card group relative rounded-xl overflow-hidden aspect-[4/5] block border hover:border-bronze-solid hover:shadow-[0_0_20px_rgba(197,160,89,0.3)] transition duration-300">
+                    <img src="https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/2d93f1232822349.Y3JvcCwxMTUwNiw5MDAwLDI1Niww.png" class="absolute inset-0 w-full h-full object-cover transition duration-500 group-hover:scale-105 opacity-80 group-hover:opacity-100">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4 translate-y-2 group-hover:translate-y-0 transition">
+                        <h3 class="font-bold text-white text-sm mb-0.5">TRIAL BLAZE</h3>
+                        <p class="text-[10px] text-bronze uppercase tracking-widest" x-text="isArabic ? 'شعار وهوية رياضية' : 'Sports Branding'"></p>
+                    </div>
+                </a>
+
+                <!-- Project 4: UPLESS logo -->
+                <a href="https://www.behance.net/gallery/231974937/UPLESS-logo" target="_blank" :class="darkMode ? 'border-white/5' : 'border-gray-200 shadow-md'" class="glass-card group relative rounded-xl overflow-hidden aspect-[4/5] block border hover:border-bronze-solid hover:shadow-[0_0_20px_rgba(197,160,89,0.3)] transition duration-300">
+                    <img src="https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/660e50231974937.Y3JvcCwyOTY5LDIzMjIsNTE0LDE3Ng.png" class="absolute inset-0 w-full h-full object-cover transition duration-500 group-hover:scale-105 opacity-80 group-hover:opacity-100">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4 translate-y-2 group-hover:translate-y-0 transition">
+                        <h3 class="font-bold text-white text-sm mb-0.5">UPLESS Logo</h3>
+                        <p class="text-[10px] text-bronze uppercase tracking-widest" x-text="isArabic ? 'تصميم شعار' : 'Commercial Identity'"></p>
+                    </div>
+                </a>
+
+                <!-- Project 5: الريادة -->
+                <a href="https://www.behance.net/gallery/231940103/_" target="_blank" :class="darkMode ? 'border-white/5' : 'border-gray-200 shadow-md'" class="glass-card group relative rounded-xl overflow-hidden aspect-[4/5] block border hover:border-bronze-solid hover:shadow-[0_0_20px_rgba(197,160,89,0.3)] transition duration-300">
+                    <img src="https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/5ab81e231940103.Y3JvcCw0MzI0LDMzODIsMTYwLDc0.png" class="absolute inset-0 w-full h-full object-cover transition duration-500 group-hover:scale-105 opacity-80 group-hover:opacity-100">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4 translate-y-2 group-hover:translate-y-0 transition">
+                        <h3 class="font-bold text-white text-sm mb-0.5">شعار الريادة</h3>
+                        <p class="text-[10px] text-bronze uppercase tracking-widest" x-text="isArabic ? 'هوية بصرية كاملة' : 'Premium Branding'"></p>
+                    </div>
+                </a>
+
+                <!-- Project 6: LOGOS 2025 PART 01 -->
+                <a href="https://www.behance.net/gallery/231677083/LOGOS-2025-PART-01" target="_blank" :class="darkMode ? 'border-white/5' : 'border-gray-200 shadow-md'" class="glass-card group relative rounded-xl overflow-hidden aspect-[4/5] block border hover:border-bronze-solid hover:shadow-[0_0_20px_rgba(197,160,89,0.3)] transition duration-300">
+                    <img src="https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/9ab1bc231677083.Y3JvcCwzMjU2LDI1NDcsMTEyLDA.png" class="absolute inset-0 w-full h-full object-cover transition duration-500 group-hover:scale-105 opacity-80 group-hover:opacity-100">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4 translate-y-2 group-hover:translate-y-0 transition">
+                        <h3 class="font-bold text-white text-sm mb-0.5">LOGOS 2025 (Part 1)</h3>
+                        <p class="text-[10px] text-bronze uppercase tracking-widest" x-text="isArabic ? 'سلسلة شعارات' : 'Logo Series'"></p>
+                    </div>
+                </a>
+
+                <!-- Project 7: ghasoul منتج غسول -->
+                <a href="https://www.behance.net/gallery/231607413/ghasoul-" target="_blank" :class="darkMode ? 'border-white/5' : 'border-gray-200 shadow-md'" class="glass-card group relative rounded-xl overflow-hidden aspect-[4/5] block border hover:border-bronze-solid hover:shadow-[0_0_20px_rgba(197,160,89,0.3)] transition duration-300">
+                    <img src="https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/5ddd5f231607413.Y3JvcCw5NTYsNzQ3LDAsMjg.jpg" class="absolute inset-0 w-full h-full object-cover transition duration-500 group-hover:scale-105 opacity-80 group-hover:opacity-100">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4 translate-y-2 group-hover:translate-y-0 transition">
+                        <h3 class="font-bold text-white text-sm mb-0.5">منتج غسول - Ghasoul</h3>
+                        <p class="text-[10px] text-bronze uppercase tracking-widest" x-text="isArabic ? 'تصميم عبوات' : 'Packaging & Brand'"></p>
+                    </div>
+                </a>
+
+                <!-- Project 8: Yaddi craft -->
+                <a href="https://www.behance.net/gallery/231606159/Yaddi-craft" target="_blank" :class="darkMode ? 'border-white/5' : 'border-gray-200 shadow-md'" class="glass-card group relative rounded-xl overflow-hidden aspect-[4/5] block border hover:border-bronze-solid hover:shadow-[0_0_20px_rgba(197,160,89,0.3)] transition duration-300">
+                    <img src="https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/823fe1231606159.Y3JvcCwyNjM0LDIwNjAsMCw1ODY.png" class="absolute inset-0 w-full h-full object-cover transition duration-500 group-hover:scale-105 opacity-80 group-hover:opacity-100">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4 translate-y-2 group-hover:translate-y-0 transition">
+                        <h3 class="font-bold text-white text-sm mb-0.5">Yaddi Craft</h3>
+                        <p class="text-[10px] text-bronze uppercase tracking-widest" x-text="isArabic ? 'هوية لعلامة يدوية' : 'Artisan Brand'"></p>
+                    </div>
+                </a>
+
+                <!-- Project 9: Ghasoul poster -->
+                <a href="https://www.behance.net/gallery/231530577/Ghasoul-poster" target="_blank" :class="darkMode ? 'border-white/5' : 'border-gray-200 shadow-md'" class="glass-card group relative rounded-xl overflow-hidden aspect-[4/5] block border hover:border-bronze-solid hover:shadow-[0_0_20px_rgba(197,160,89,0.3)] transition duration-300">
+                    <img src="https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/5a9902231530577.Y3JvcCw5NjAsNzUwLDAsMjMy.jpg" class="absolute inset-0 w-full h-full object-cover transition duration-500 group-hover:scale-105 opacity-80 group-hover:opacity-100">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4 translate-y-2 group-hover:translate-y-0 transition">
+                        <h3 class="font-bold text-white text-sm mb-0.5">ملصق غسول - Poster</h3>
+                        <p class="text-[10px] text-bronze uppercase tracking-widest" x-text="isArabic ? 'ملصق إعلاني' : 'Ad Campaign Poster'"></p>
+                    </div>
+                </a>
+
+                <!-- Project 10: سقلة تبرام -->
+                <a href="https://www.behance.net/gallery/231530315/_" target="_blank" :class="darkMode ? 'border-white/5' : 'border-gray-200 shadow-md'" class="glass-card group relative rounded-xl overflow-hidden aspect-[4/5] block border hover:border-bronze-solid hover:shadow-[0_0_20px_rgba(197,160,89,0.3)] transition duration-300">
+                    <img src="https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/f94e6b231530315.Y3JvcCwzODM1LDMwMDAsODUsMA.png" class="absolute inset-0 w-full h-full object-cover transition duration-500 group-hover:scale-105 opacity-80 group-hover:opacity-100">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4 translate-y-2 group-hover:translate-y-0 transition">
+                        <h3 class="font-bold text-white text-sm mb-0.5">سقلة تبرام</h3>
+                        <p class="text-[10px] text-bronze uppercase tracking-widest" x-text="isArabic ? 'تغليف مستحضرات طبيعية' : 'Cosmetics & Natural Beauty'"></p>
+                    </div>
+                </a>
+
+            </div>
+
+        </div>
+
+        <!-- ================= 7. ABOUT THE ART INSTRUCTOR (BIOLOGICAL ART INTERSECTION) ================= -->
+        <div x-show="currentPage === 'about'" class="page-fade space-y-12" style="display: none;">
+            
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+                
+                <!-- Left Bio Card -->
+                <div class="lg:col-span-4 space-y-6">
+                    <div :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10' : 'bg-white border-[#C5A059]/20 shadow-lg'" class="p-8 text-center relative overflow-hidden group rounded-[20px] border">
+                        <div class="absolute inset-0 bg-[#C5A059]/10 opacity-30 mix-blend-overlay z-0"></div>
+                        <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800" class="absolute inset-0 w-full h-full object-cover opacity-10 group-hover:scale-105 transition-transform duration-700 z-0">
+                        
+                        <div class="relative z-10 space-y-4">
+                            <div class="w-32 h-32 mx-auto rounded-full border-2 border-[#C5A059] overflow-hidden bg-[#1A1A1A] shadow-[0_0_25px_rgba(197,160,89,0.4)]">
+                                <img src="instructor.jpg" alt="Fodil Kerchani" class="w-full h-full object-cover object-center hover:scale-110 transition-transform duration-500">
+                            </div>
+                            <div class="space-y-1">
+                                <h2 class="amiri-title text-3xl font-black" :class="darkMode ? 'text-white' : 'text-black'" x-text="isArabic ? 'فضيل كرشاني' : 'Fodil Kerchani'"></h2>
+                                <p class="text-xs uppercase tracking-widest text-bronze font-bold">Fodil.Art / Fodil Prod</p>
+                            </div>
+                            <div class="flex flex-wrap justify-center gap-2">
+                                <span :class="darkMode ? 'bg-white/5 border-white/10' : 'bg-gray-100 border-gray-300'" class="px-2.5 py-0.5 border rounded text-[11px]" x-text="isArabic ? 'الجزائر — مستغانم' : 'Algeria — Mostaganem'"></span>
+                                <span :class="darkMode ? 'bg-white/5 border-white/10' : 'bg-gray-100 border-gray-300'" class="px-2.5 py-0.5 border rounded text-[11px]" x-text="isArabic ? 'فنان ومخرج بصري' : 'Visual Director'"></span>
+                            </div>
+                            <p class="text-xs leading-relaxed pt-2" :class="darkMode ? 'text-gray-400' : 'text-gray-600'" x-text="isArabic ? 'فنان ومخرج بصري، مصمم جرافيك، محرر ومصور يدمج الأكاديمية الصارمة مع الفن التفاعلي.' : 'A premium visual artist, director, designer, and photographer merging academic principles with dynamic interactive aesthetics.'"></p>
+                        </div>
+                    </div>
+
+                    <!-- Digital Presence Links -->
+                    <div :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10' : 'bg-white border-[#C5A059]/20 shadow-md'" class="p-6 space-y-4 rounded-[20px] border">
+                        <h4 class="amiri-title text-lg font-bold border-b border-[#C5A059]/10 pb-2" :class="darkMode ? 'text-white' : 'text-black'" x-text="isArabic ? 'المنصات الرقمية' : 'Digital Presence'"></h4>
+                        <div class="space-y-2">
+                            <a href="landing.html" target="_blank" class="flex justify-between items-center p-3 rounded-lg border hover:border-bronze-solid transition text-xs font-bold animate-pulse" :class="darkMode ? 'text-[#C5A059] bg-[#C5A059]/10 border-[#C5A059]/30' : 'text-[#9C7A3C] bg-[#C5A059]/15 border-[#C5A059]/40 shadow-sm'">
+                                <span x-text="isArabic ? '🔗 بوابة الروابط والاتصال المتكاملة' : '🔗 Fodil\'s Dynamic Links Portal'"></span>
+                                <span class="text-bronze">&rarr;</span>
+                            </a>
+                            <a href="https://fodil.design" target="_blank" class="flex justify-between items-center p-3 rounded-lg bg-white/5 border border-white/5 hover:border-bronze-solid transition text-xs" :class="darkMode ? 'text-gray-300' : 'text-gray-700 bg-gray-100/50'">
+                                <span>🌐 Fodil Design</span>
+                                <span class="text-bronze">&rarr;</span>
+                            </a>
+                            <a href="https://linktr.ee/fodil.art_kerchani?utm_source=linktree_profile_share&ltsid=cbf7c937-7374-48df-aa73-d97eab47abb6" target="_blank" class="flex justify-between items-center p-3 rounded-lg bg-white/5 border border-white/5 hover:border-bronze-solid transition text-xs" :class="darkMode ? 'text-gray-300' : 'text-gray-700 bg-gray-100/50'">
+                                <span>🔗 Linktree Profile</span>
+                                <span class="text-bronze">&rarr;</span>
+                            </a>
+                            <a href="https://bento.me/fodilart" target="_blank" class="flex justify-between items-center p-3 rounded-lg bg-white/5 border border-white/5 hover:border-bronze-solid transition text-xs" :class="darkMode ? 'text-gray-300' : 'text-gray-700 bg-gray-100/50'">
+                                <span>🍱 Bento Space</span>
+                                <span class="text-bronze">&rarr;</span>
+                            </a>
+                            <a href="https://instagram.com/fodilart" target="_blank" class="flex justify-between items-center p-3 rounded-lg bg-white/5 border border-white/5 hover:border-bronze-solid transition text-xs" :class="darkMode ? 'text-gray-300' : 'text-gray-700 bg-gray-100/50'">
+                                <span>📸 Instagram @fodilart</span>
+                                <span class="text-bronze">&rarr;</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Intersectional Content -->
+                <div class="lg:col-span-8 space-y-8">
+                    <!-- Bio-Art Concept -->
+                    <div :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10' : 'bg-white border-[#C5A059]/20 shadow-lg'" class="p-8 border-t-4 border-t-bronze space-y-6 rounded-[20px] border">
+                        <h3 class="amiri-title text-3xl font-black flex items-center gap-3" :class="darkMode ? 'text-white' : 'text-black'">
+                            <span>🧬</span>
+                            <span x-text="isArabic ? 'التقاطع الفريد بين العلم والفن (Bio-Art)' : 'The Intersectional Bio-Art Theory'"></span>
+                        </h3>
+                        <div class="text-sm leading-relaxed space-y-4" :class="darkMode ? 'text-gray-300' : 'text-gray-700'">
+                            <p>
+                                <span x-show="isArabic">
+                                    إن ما يميز المنهجية الفنية للمصمم **Fodil Kerchani** هو الجمع الفريد بين مسيرته الأكاديمية في **الكيمياء الحيوية التطبيقية وهندسة الأنسجة (Master 1)** وشغفه المتواصل في **المدرسة الجهوية للفنون الجميلة بمستغانم**.
+                                </span>
+                                <span x-show="!isArabic">
+                                    The core methodology curated by **Fodil Kerchani** is driven by his master studies in **Applied Biochemistry & Tissue Engineering** balanced with classical studies at the **Regional Fine Arts School of Mostaganem**.
+                                </span>
+                            </p>
+                            <p>
+                                <span x-show="isArabic">
+                                    مهتم بـ **تاريخ الفن** بكافة مدارسه كالفن الإسلامي والشرقي والمعاصر، ويسعى دوماً لاستلهام النظم الهندسية الطبيعية وبنية الأنسجة والخلايا الحيوية وتطبيقها لبناء تصاميم بصرية سينمائية متوازنة ونماذج نابضة بالبساطة والفخامة.
+                                </span>
+                                <span x-show="!isArabic">
+                                    He focuses on ancient and modern **Art History**, translating biological architecture, organic visual networks, and cell structural principles into high contrast, minimalist layouts.
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Skills & Toolkit -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10' : 'bg-white border-[#C5A059]/20 shadow-md'" class="p-6 space-y-4 rounded-[20px] border">
+                            <h4 class="amiri-title text-xl font-bold text-bronze border-b border-[#C5A059]/10 pb-2" x-text="isArabic ? 'الأسلوب الفني والجمالي' : 'Artistic Styles & Aesthetics'"></h4>
+                            <ul class="text-xs space-y-2" :class="darkMode ? 'text-gray-300' : 'text-gray-700'">
+                                <li>🎬 <span x-text="isArabic ? 'لقطات سينمائية عالية التباين (Chiaroscuro)' : 'Chiaroscuro High-contrast Cinematic Framing'"></span></li>
+                                <li>🏎️ <span x-text="isArabic ? 'جماليات تصاميم ميكانيكا السيارات الرياضية' : 'Automotive sports mechanical visuals'"></span></li>
+                                <li>🏙️ <span x-text="isArabic ? 'تصاميم أزياء الشارع المعاصرة (Streetwear)' : 'Modern streetwear culture layouts'"></span></li>
+                            </ul>
+                        </div>
+                        <div :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10' : 'bg-white border-[#C5A059]/20 shadow-md'" class="p-6 space-y-4 rounded-[20px] border">
+                            <h4 class="amiri-title text-xl font-bold text-bronze border-b border-[#C5A059]/10 pb-2" x-text="isArabic ? 'الأدوات والتقنيات' : 'Technical Toolkit'"></h4>
+                            <ul class="text-xs space-y-2" :class="darkMode ? 'text-gray-300' : 'text-gray-700'">
+                                <li>🎞️ <span x-text="isArabic ? 'التحرير والمونتاج الاحترافي ببرنامج Premiere Pro' : 'Professional video editing using Premiere Pro'"></span></li>
+                                <li>🧊 <span x-text="isArabic ? 'النمذجة ثلاثية الأبعاد ببرنامج Blender' : '3D asset modeling and lighting with Blender'"></span></li>
+                                <li>🎨 <span x-text="isArabic ? 'تصحيح وتلوين المشاهد ببرنامج DaVinci Resolve' : 'Cinematic color correction in DaVinci Resolve'"></span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ================= NEW: MONTAGE BASICS ================= -->
+                <div x-show="currentPage === 'montage_basics'" class="page-fade space-y-12" style="display: none;">
+            <div class="text-center space-y-4 pt-10">
+                <h2 class="amiri-title text-4xl md:text-5xl font-black" :class="darkMode ? 'text-white' : 'text-[#1E1E1E]'" x-text="isArabic ? 'أساسيات المونتاج' : 'Video Editing Basics'"></h2>
+                <p class="max-w-2xl mx-auto text-lg font-light" :class="darkMode ? 'text-gray-400' : 'text-gray-600'" x-text="isArabic ? 'تعلم المبادئ والقواعد الأساسية للمونتاج قبل القفز إلى البرامج والأدوات.' : 'Learn the fundamental principles and rules of video editing before jumping into software.'"></p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                <div class="w-full rounded-[20px] overflow-hidden border sticky top-28" :class="darkMode ? 'border-[#C5A059]/20 shadow-[0_0_30px_rgba(197,160,89,0.15)]' : 'border-[#C5A059]/30 shadow-lg'">
+                    <img src="vn_basics.png" alt="Video Editing Basics" class="w-full h-auto max-h-[600px] object-cover hover:scale-105 transition-transform duration-700">
+                </div>
+                
+                <div class="space-y-8">
+                    <div :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10' : 'bg-white border-[#C5A059]/20 shadow-md'" class="p-8 rounded-[20px] border">
+                        <h3 class="amiri-title text-2xl font-bold text-bronze mb-4" x-text="isArabic ? 'الإيقاع والقص' : 'Pacing & Cuts'"></h3>
+                        <p class="text-sm leading-relaxed" :class="darkMode ? 'text-gray-300' : 'text-gray-700'" x-text="isArabic ? 'المونتاج ليس مجرد تقطيع للفيديو؛ بل هو تحكم كامل بإيقاع القصة ومشاعر المشاهد.' : 'Editing is not just cutting video; it is controlling the pace of the story and the viewer\'s emotions.'"></p>
+                    </div>
+                    
+                    <div :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10' : 'bg-white border-[#C5A059]/20 shadow-md'" class="p-8 rounded-[20px] border">
+                        <h3 class="amiri-title text-2xl font-bold text-bronze mb-4" x-text="isArabic ? 'التكوين والصوت' : 'Composition & Audio'"></h3>
+                        <p class="text-sm leading-relaxed" :class="darkMode ? 'text-gray-300' : 'text-gray-700'" x-text="isArabic ? 'الصوت يمثل 50% من تجربة الفيديو. اختياراتك للمؤثرات والموسيقى تحدد نجاح المشهد.' : 'Sound makes up 50% of the video experience. Your choices of effects and music determine the success of the scene.'"></p>
+                    </div>
+                    
+                    <div :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10' : 'bg-white border-[#C5A059]/20 shadow-md'" class="p-8 rounded-[20px] border">
+                        <!-- Quiz Basics -->
+                        <div x-data="{ qIndex: 0, score: 0, showRes: false, selected: null, qs: window.quizData['montage_basics'] }">
+                            <h4 class="amiri-title text-xl font-bold text-[#C5A059] mb-4" x-text="isArabic ? 'اختبر معلوماتك (10 أسئلة)' : 'Test Your Knowledge (10 Questions)'"></h4>
+                            <div x-show="!showRes">
+                                <p class="text-sm mb-4 font-bold" :class="darkMode ? 'text-white' : 'text-black'" x-text="qs[qIndex].q"></p>
+                                <div class="space-y-2">
+                                    <template x-for="(opt, i) in qs[qIndex].options">
+                                        <button @click="selected = i" class="w-full text-right p-3 rounded-lg border text-sm transition-all" :class="selected === i ? 'bg-[#C5A059]/20 border-[#C5A059] text-[#C5A059]' : (darkMode ? 'bg-white/5 border-white/10 text-gray-300 hover:border-[#C5A059]' : 'bg-gray-50 border-gray-200 text-gray-700 hover:border-[#C5A059]')" x-text="opt"></button>
+                                    </template>
+                                </div>
+                                <button @click="if(selected !== null){ if(selected === qs[qIndex].correct) score++; if(qIndex < 9) { qIndex++; selected=null; } else { showRes=true; } }" class="mt-4 px-6 py-2 bg-[#C5A059] text-black font-bold rounded-full text-sm hover:scale-105 transition" :disabled="selected === null" :class="selected === null ? 'opacity-50 cursor-not-allowed' : ''" x-text="isArabic ? (qIndex < 9 ? 'السؤال التالي' : 'إظهار النتيجة') : (qIndex < 9 ? 'Next Question' : 'Show Result')"></button>
+                            </div>
+                            <div x-show="showRes" class="text-center p-6 rounded-xl" :class="darkMode ? 'bg-white/5' : 'bg-gray-100'">
+                                <h4 class="text-2xl font-bold text-[#C5A059] mb-2" x-text="isArabic ? 'نتيجتك النهائية' : 'Final Score'"></h4>
+                                <div class="text-4xl font-black mb-4" :class="darkMode ? 'text-white' : 'text-black'" x-text="score + ' / 10'"></div>
+                                <button @click="qIndex=0; score=0; showRes=false; selected=null;" class="px-6 py-2 border border-[#C5A059] text-[#C5A059] rounded-full text-sm font-bold hover:bg-[#C5A059] hover:text-black transition" x-text="isArabic ? 'إعادة الاختبار' : 'Retry Quiz'"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center pt-8">
+                <button @click="currentPage = 'montage_vn'; window.scrollTo(0,0);" class="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-[#C5A059] text-black font-extrabold text-lg shadow-[0_4px_20px_rgba(197,160,89,0.35)] hover:scale-105 transition">
+                    <span x-text="isArabic ? 'الصفحة الموالية: تعليم المونطاج ببرنامج VN' : 'Next Page: VN App Editing'"></span>
+                    <span>&rarr;</span>
+                </button>
+            </div>
+        </div>
+
+<!-- ================= NEW: MONTAGE VN ================= -->
+        <div x-show="currentPage === 'montage_vn'" class="page-fade space-y-12" style="display: none;">
+            <div class="text-center space-y-4 pt-10">
+                <h2 class="amiri-title text-4xl md:text-5xl font-black" :class="darkMode ? 'text-white' : 'text-[#1E1E1E]'">
+                    <span x-show="isArabic">دورة إتقان المونتاج بتطبيق <strong class="text-[#C5A059]">VN</strong></span>
+                    <span x-show="!isArabic">Mastering <strong class="text-[#C5A059]">VN App</strong> Editing</span>
+                </h2>
+                <p class="max-w-2xl mx-auto text-lg font-light" :class="darkMode ? 'text-gray-400' : 'text-gray-600'" x-text="isArabic ? 'من الأساسيات إلى الإخراج السينمائي' : 'From Basics to Cinematic Output'"></p>
+            </div>
+
+            <div class="space-y-12">
+                <!-- Unit 1 -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                    <div>
+                        <div :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10' : 'bg-white border-[#C5A059]/20 shadow-md'" class="p-8 rounded-[20px] border">
+                            <h3 class="amiri-title text-2xl font-bold text-[#C5A059] mb-2">الوحدة الأولى: البداية القوية (الأساسيات وتهيئة بيئة العمل)</h3>
+                            <p class="text-sm font-bold mb-4" :class="darkMode ? 'text-gray-400' : 'text-gray-600'">تهدف هذه الوحدة إلى كسر الحاجز بين المستخدم وواجهة التطبيق، وفهم سير العمل الصحيح.</p>
+                            <ul class="text-sm space-y-3 leading-relaxed list-disc list-inside" :class="darkMode ? 'text-gray-300' : 'text-gray-700'">
+                                <li><strong>نظرة عامة على واجهة VN:</strong> شرح مساحة العمل، شريط الأدوات، والمسارات (Timeline).</li>
+                                <li><strong>إعدادات المشروع:</strong> اختيار أبعاد الفيديو الصحيحة (Aspect Ratio) لتناسب المنصات المختلفة (يوتيوب، إنستغرام ريلز، تيك توك).</li>
+                                <li><strong>استيراد الوسائط:</strong> كيفية ترتيب وإضافة مقاطع الفيديو، الصور، والصوتيات إلى المشروع.</li>
+                                <li><strong>القص والدمج الأساسي:</strong> استخدام أدوات (Split, Trim, Delete) لترتيب المشاهد وإزالة الأجزاء غير المرغوب فيها.</li>
+                            </ul>
+                            <!-- Quiz Unit 1 -->
+                            <div x-data="{ qIndex: 0, score: 0, showRes: false, selected: null, qs: window.quizData['unit_1'] }" class="mt-6 border-t border-[#C5A059]/20 pt-6">
+                                <h4 class="amiri-title text-xl font-bold text-[#C5A059] mb-4" x-text="isArabic ? 'اختبر معلوماتك (10 أسئلة)' : 'Test Your Knowledge (10 Questions)'"></h4>
+                                <div x-show="!showRes">
+                                    <p class="text-sm mb-4 font-bold" :class="darkMode ? 'text-white' : 'text-black'" x-text="qs[qIndex].q"></p>
+                                    <div class="space-y-2">
+                                        <template x-for="(opt, i) in qs[qIndex].options">
+                                            <button @click="selected = i" class="w-full text-right p-3 rounded-lg border text-sm transition-all" :class="selected === i ? 'bg-[#C5A059]/20 border-[#C5A059] text-[#C5A059]' : (darkMode ? 'bg-white/5 border-white/10 text-gray-300 hover:border-[#C5A059]' : 'bg-gray-50 border-gray-200 text-gray-700 hover:border-[#C5A059]')" x-text="opt"></button>
+                                        </template>
+                                    </div>
+                                    <button @click="if(selected !== null){ if(selected === qs[qIndex].correct) score++; if(qIndex < 9) { qIndex++; selected=null; } else { showRes=true; } }" class="mt-4 px-6 py-2 bg-[#C5A059] text-black font-bold rounded-full text-sm hover:scale-105 transition" :disabled="selected === null" :class="selected === null ? 'opacity-50 cursor-not-allowed' : ''" x-text="isArabic ? (qIndex < 9 ? 'السؤال التالي' : 'إظهار النتيجة') : (qIndex < 9 ? 'Next Question' : 'Show Result')"></button>
+                                </div>
+                                <div x-show="showRes" class="text-center p-6 rounded-xl" :class="darkMode ? 'bg-white/5' : 'bg-gray-100'">
+                                    <h4 class="text-2xl font-bold text-[#C5A059] mb-2" x-text="isArabic ? 'نتيجتك النهائية' : 'Final Score'"></h4>
+                                    <div class="text-4xl font-black mb-4" :class="darkMode ? 'text-white' : 'text-black'" x-text="score + ' / 10'"></div>
+                                    <button @click="qIndex=0; score=0; showRes=false; selected=null;" class="px-6 py-2 border border-[#C5A059] text-[#C5A059] rounded-full text-sm font-bold hover:bg-[#C5A059] hover:text-black transition" x-text="isArabic ? 'إعادة الاختبار' : 'Retry Quiz'"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="rounded-[20px] overflow-hidden border sticky top-28" :class="darkMode ? 'border-[#C5A059]/20 shadow-[0_0_30px_rgba(197,160,89,0.15)]' : 'border-[#C5A059]/30 shadow-lg'">
+                        <img src="vn_workspace.png" alt="VN Workspace" class="w-full h-auto max-h-[600px] object-cover hover:scale-105 transition-transform duration-700">
+                    </div>
+                </div>
+
+                <!-- Unit 2 -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                    <div class="rounded-[20px] overflow-hidden border sticky top-28 lg:order-1 order-2" :class="darkMode ? 'border-[#C5A059]/20 shadow-[0_0_30px_rgba(197,160,89,0.15)]' : 'border-[#C5A059]/30 shadow-lg'">
+                        <img src="vn_transitions.png" alt="VN Transitions" class="w-full h-auto max-h-[600px] object-cover hover:scale-105 transition-transform duration-700">
+                    </div>
+                    <div class="lg:order-2 order-1">
+                        <div :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10' : 'bg-white border-[#C5A059]/20 shadow-md'" class="p-8 rounded-[20px] border">
+                            <h3 class="amiri-title text-2xl font-bold text-[#C5A059] mb-2">الوحدة الثانية: بناء القصة (الانتقالات والتحكم في الإيقاع)</h3>
+                            <p class="text-sm font-bold mb-4" :class="darkMode ? 'text-gray-400' : 'text-gray-600'">هنا يبدأ الفيديو بأخذ شكله الأولي من خلال ربط المشاهد والتحكم في سرعتها.</p>
+                            <ul class="text-sm space-y-3 leading-relaxed list-disc list-inside" :class="darkMode ? 'text-gray-300' : 'text-gray-700'">
+                                <li><strong>الانتقالات (Transitions):</strong> متى وكيف تستخدم الانتقالات الناعمة والحركية دون المبالغة، للحفاظ على طابع عصري واحترافي.</li>
+                                <li><strong>التحكم في السرعة (Speed Curve):</strong> شرح أداة المنحنى الزمني لتسريع أو تبطيء الفيديو (Slow Motion & Time-lapse) لخلق تأثيرات درامية.</li>
+                                <li><strong>تجميد اللقطة (Freeze Frame) والانعكاس (Reverse):</strong> تقنيات لإبراز لحظات معينة في الفيديو.</li>
+                            </ul>
+                            <!-- Quiz Unit 2 -->
+                            <div x-data="{ qIndex: 0, score: 0, showRes: false, selected: null, qs: window.quizData['unit_2'] }" class="mt-6 border-t border-[#C5A059]/20 pt-6">
+                                <h4 class="amiri-title text-xl font-bold text-[#C5A059] mb-4" x-text="isArabic ? 'اختبر معلوماتك (10 أسئلة)' : 'Test Your Knowledge (10 Questions)'"></h4>
+                                <div x-show="!showRes">
+                                    <p class="text-sm mb-4 font-bold" :class="darkMode ? 'text-white' : 'text-black'" x-text="qs[qIndex].q"></p>
+                                    <div class="space-y-2">
+                                        <template x-for="(opt, i) in qs[qIndex].options">
+                                            <button @click="selected = i" class="w-full text-right p-3 rounded-lg border text-sm transition-all" :class="selected === i ? 'bg-[#C5A059]/20 border-[#C5A059] text-[#C5A059]' : (darkMode ? 'bg-white/5 border-white/10 text-gray-300 hover:border-[#C5A059]' : 'bg-gray-50 border-gray-200 text-gray-700 hover:border-[#C5A059]')" x-text="opt"></button>
+                                        </template>
+                                    </div>
+                                    <button @click="if(selected !== null){ if(selected === qs[qIndex].correct) score++; if(qIndex < 9) { qIndex++; selected=null; } else { showRes=true; } }" class="mt-4 px-6 py-2 bg-[#C5A059] text-black font-bold rounded-full text-sm hover:scale-105 transition" :disabled="selected === null" :class="selected === null ? 'opacity-50 cursor-not-allowed' : ''" x-text="isArabic ? (qIndex < 9 ? 'السؤال التالي' : 'إظهار النتيجة') : (qIndex < 9 ? 'Next Question' : 'Show Result')"></button>
+                                </div>
+                                <div x-show="showRes" class="text-center p-6 rounded-xl" :class="darkMode ? 'bg-white/5' : 'bg-gray-100'">
+                                    <h4 class="text-2xl font-bold text-[#C5A059] mb-2" x-text="isArabic ? 'نتيجتك النهائية' : 'Final Score'"></h4>
+                                    <div class="text-4xl font-black mb-4" :class="darkMode ? 'text-white' : 'text-black'" x-text="score + ' / 10'"></div>
+                                    <button @click="qIndex=0; score=0; showRes=false; selected=null;" class="px-6 py-2 border border-[#C5A059] text-[#C5A059] rounded-full text-sm font-bold hover:bg-[#C5A059] hover:text-black transition" x-text="isArabic ? 'إعادة الاختبار' : 'Retry Quiz'"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Unit 3 -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                    <div>
+                        <div :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10' : 'bg-white border-[#C5A059]/20 shadow-md'" class="p-8 rounded-[20px] border">
+                            <h3 class="amiri-title text-2xl font-bold text-[#C5A059] mb-2">الوحدة الثالثة: اللمسة السينمائية والهوية البصرية (الاحترافية)</h3>
+                            <p class="text-sm font-bold mb-4" :class="darkMode ? 'text-gray-400' : 'text-gray-600'">تركز هذه الوحدة على تحويل الفيديو العادي إلى لوحة بصرية ذات طابع فني ولوك فاخر.</p>
+                            <ul class="text-sm space-y-3 leading-relaxed list-disc list-inside" :class="darkMode ? 'text-gray-300' : 'text-gray-700'">
+                                <li><strong>التلوين والتصحيح اللوني (Color Grading & Correction):</strong> ضبط الإضاءة، التباين، والتشبع. استخدام فلاتر التطبيق وتعديلها. تطبيق فلاتر LUTs خارجية للحصول على ألوان سينمائية مخصصة.</li>
+                                <li><strong>الرسوم المتحركة والإطارات المفتاحية (Keyframes):</strong> تحريك العناصر، الصور، والنصوص يدوياً لخلق تفاعلات بصرية دقيقة.</li>
+                                <li><strong>أقنعة الإخفاء (Masking):</strong> دمج مقاطع متعددة، وتأطير المشاهد بأشكال هندسية، أو خلق تأثيرات بصرية متقدمة.</li>
+                                <li><strong>أنماط الدمج (Blending Modes):</strong> دمج الفيديوهات مع خلفيات سوداء أو مؤثرات ضوئية وتكوينات فنية مبدعة.</li>
+                            </ul>
+                            <!-- Quiz Unit 3 -->
+                            <div x-data="{ qIndex: 0, score: 0, showRes: false, selected: null, qs: window.quizData['unit_3'] }" class="mt-6 border-t border-[#C5A059]/20 pt-6">
+                                <h4 class="amiri-title text-xl font-bold text-[#C5A059] mb-4" x-text="isArabic ? 'اختبر معلوماتك (10 أسئلة)' : 'Test Your Knowledge (10 Questions)'"></h4>
+                                <div x-show="!showRes">
+                                    <p class="text-sm mb-4 font-bold" :class="darkMode ? 'text-white' : 'text-black'" x-text="qs[qIndex].q"></p>
+                                    <div class="space-y-2">
+                                        <template x-for="(opt, i) in qs[qIndex].options">
+                                            <button @click="selected = i" class="w-full text-right p-3 rounded-lg border text-sm transition-all" :class="selected === i ? 'bg-[#C5A059]/20 border-[#C5A059] text-[#C5A059]' : (darkMode ? 'bg-white/5 border-white/10 text-gray-300 hover:border-[#C5A059]' : 'bg-gray-50 border-gray-200 text-gray-700 hover:border-[#C5A059]')" x-text="opt"></button>
+                                        </template>
+                                    </div>
+                                    <button @click="if(selected !== null){ if(selected === qs[qIndex].correct) score++; if(qIndex < 9) { qIndex++; selected=null; } else { showRes=true; } }" class="mt-4 px-6 py-2 bg-[#C5A059] text-black font-bold rounded-full text-sm hover:scale-105 transition" :disabled="selected === null" :class="selected === null ? 'opacity-50 cursor-not-allowed' : ''" x-text="isArabic ? (qIndex < 9 ? 'السؤال التالي' : 'إظهار النتيجة') : (qIndex < 9 ? 'Next Question' : 'Show Result')"></button>
+                                </div>
+                                <div x-show="showRes" class="text-center p-6 rounded-xl" :class="darkMode ? 'bg-white/5' : 'bg-gray-100'">
+                                    <h4 class="text-2xl font-bold text-[#C5A059] mb-2" x-text="isArabic ? 'نتيجتك النهائية' : 'Final Score'"></h4>
+                                    <div class="text-4xl font-black mb-4" :class="darkMode ? 'text-white' : 'text-black'" x-text="score + ' / 10'"></div>
+                                    <button @click="qIndex=0; score=0; showRes=false; selected=null;" class="px-6 py-2 border border-[#C5A059] text-[#C5A059] rounded-full text-sm font-bold hover:bg-[#C5A059] hover:text-black transition" x-text="isArabic ? 'إعادة الاختبار' : 'Retry Quiz'"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="rounded-[20px] overflow-hidden border sticky top-28" :class="darkMode ? 'border-[#C5A059]/20 shadow-[0_0_30px_rgba(197,160,89,0.15)]' : 'border-[#C5A059]/30 shadow-lg'">
+                        <img src="vn_color_grading.png" alt="VN Color Grading" class="w-full h-auto max-h-[600px] object-cover hover:scale-105 transition-transform duration-700">
+                    </div>
+                </div>
+
+                <!-- Unit 4 -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                    <div class="rounded-[20px] overflow-hidden border sticky top-28 lg:order-1 order-2" :class="darkMode ? 'border-[#C5A059]/20 shadow-[0_0_30px_rgba(197,160,89,0.15)]' : 'border-[#C5A059]/30 shadow-lg'">
+                        <img src="vn_audio.png" alt="VN Audio" class="w-full h-auto max-h-[600px] object-cover hover:scale-105 transition-transform duration-700">
+                    </div>
+                    <div class="lg:order-2 order-1">
+                        <div :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10' : 'bg-white border-[#C5A059]/20 shadow-md'" class="p-8 rounded-[20px] border">
+                            <h3 class="amiri-title text-2xl font-bold text-[#C5A059] mb-2">الوحدة الرابعة: التصميم الصوتي والنصوص (التجربة المتكاملة)</h3>
+                            <p class="text-sm font-bold mb-4" :class="darkMode ? 'text-gray-400' : 'text-gray-600'">الصوت والنصوص هما نصف التجربة؛ هذه الوحدة تضمن إيصال الرسالة بوضوح.</p>
+                            <ul class="text-sm space-y-3 leading-relaxed list-disc list-inside" :class="darkMode ? 'text-gray-300' : 'text-gray-700'">
+                                <li><strong>المكساج الصوتي الأساسي:</strong> دمج الموسيقى الخلفية مع المؤثرات الصوتية (SFX) والتعليق الصوتي (Voice-over).</li>
+                                <li><strong>المزامنة (Audio Syncing):</strong> ضبط الإيقاع البصري (القص والانتقالات) مع إيقاع الموسيقى.</li>
+                                <li><strong>إضافة النصوص والعناوين:</strong> كتابة نصوص عصرية، وتطبيق حركات (Text Animations) تتناسب مع الهوية البصرية.</li>
+                                <li><strong>الترجمة التلقائية (Subtitles):</strong> كيفية إضافة وتنسيق الشروحات بأسلوب جذاب ومقروء.</li>
+                            </ul>
+                            <!-- Quiz Unit 4 -->
+                            <div x-data="{ qIndex: 0, score: 0, showRes: false, selected: null, qs: window.quizData['unit_4'] }" class="mt-6 border-t border-[#C5A059]/20 pt-6">
+                                <h4 class="amiri-title text-xl font-bold text-[#C5A059] mb-4" x-text="isArabic ? 'اختبر معلوماتك (10 أسئلة)' : 'Test Your Knowledge (10 Questions)'"></h4>
+                                <div x-show="!showRes">
+                                    <p class="text-sm mb-4 font-bold" :class="darkMode ? 'text-white' : 'text-black'" x-text="qs[qIndex].q"></p>
+                                    <div class="space-y-2">
+                                        <template x-for="(opt, i) in qs[qIndex].options">
+                                            <button @click="selected = i" class="w-full text-right p-3 rounded-lg border text-sm transition-all" :class="selected === i ? 'bg-[#C5A059]/20 border-[#C5A059] text-[#C5A059]' : (darkMode ? 'bg-white/5 border-white/10 text-gray-300 hover:border-[#C5A059]' : 'bg-gray-50 border-gray-200 text-gray-700 hover:border-[#C5A059]')" x-text="opt"></button>
+                                        </template>
+                                    </div>
+                                    <button @click="if(selected !== null){ if(selected === qs[qIndex].correct) score++; if(qIndex < 9) { qIndex++; selected=null; } else { showRes=true; } }" class="mt-4 px-6 py-2 bg-[#C5A059] text-black font-bold rounded-full text-sm hover:scale-105 transition" :disabled="selected === null" :class="selected === null ? 'opacity-50 cursor-not-allowed' : ''" x-text="isArabic ? (qIndex < 9 ? 'السؤال التالي' : 'إظهار النتيجة') : (qIndex < 9 ? 'Next Question' : 'Show Result')"></button>
+                                </div>
+                                <div x-show="showRes" class="text-center p-6 rounded-xl" :class="darkMode ? 'bg-white/5' : 'bg-gray-100'">
+                                    <h4 class="text-2xl font-bold text-[#C5A059] mb-2" x-text="isArabic ? 'نتيجتك النهائية' : 'Final Score'"></h4>
+                                    <div class="text-4xl font-black mb-4" :class="darkMode ? 'text-white' : 'text-black'" x-text="score + ' / 10'"></div>
+                                    <button @click="qIndex=0; score=0; showRes=false; selected=null;" class="px-6 py-2 border border-[#C5A059] text-[#C5A059] rounded-full text-sm font-bold hover:bg-[#C5A059] hover:text-black transition" x-text="isArabic ? 'إعادة الاختبار' : 'Retry Quiz'"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Unit 5 -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                    <div>
+                        <div :class="darkMode ? 'bg-[#1A1A1A]/70 border-[#C5A059]/10' : 'bg-white border-[#C5A059]/20 shadow-md'" class="p-8 rounded-[20px] border">
+                            <h3 class="amiri-title text-2xl font-bold text-[#C5A059] mb-2">الوحدة الخامسة: تسريع سير العمل والتصدير النهائي</h3>
+                            <p class="text-sm font-bold mb-4" :class="darkMode ? 'text-gray-400' : 'text-gray-600'">اللمسات الأخيرة وكيفية توفير الوقت في المشاريع المستقبلية.</p>
+                            <ul class="text-sm space-y-3 leading-relaxed list-disc list-inside" :class="darkMode ? 'text-gray-300' : 'text-gray-700'">
+                                <li><strong>الطبقات المتعددة (PIP - Picture in Picture):</strong> إضافة شعارات، رسومات توضيحية، أو فيديوهات فوق الفيديو الأساسي.</li>
+                                <li><strong>إدارة القوالب (Templates):</strong> حفظ التأثيرات وإعدادات التلوين لاستخدامها في المشاريع القادمة لضمان استمرارية نفس الهوية البصرية.</li>
+                                <li><strong>إعدادات التصدير (Export Settings):</strong> اختيار الدقة (Resolution) ومعدل الإطارات (FPS) ومعدل البت (Bitrate) الأنسب للحفاظ على أعلى جودة عند النشر.</li>
+                            </ul>
+                            <!-- Quiz Unit 5 -->
+                            <div x-data="{ qIndex: 0, score: 0, showRes: false, selected: null, qs: window.quizData['unit_5'] }" class="mt-6 border-t border-[#C5A059]/20 pt-6">
+                                <h4 class="amiri-title text-xl font-bold text-[#C5A059] mb-4" x-text="isArabic ? 'اختبر معلوماتك (10 أسئلة)' : 'Test Your Knowledge (10 Questions)'"></h4>
+                                <div x-show="!showRes">
+                                    <p class="text-sm mb-4 font-bold" :class="darkMode ? 'text-white' : 'text-black'" x-text="qs[qIndex].q"></p>
+                                    <div class="space-y-2">
+                                        <template x-for="(opt, i) in qs[qIndex].options">
+                                            <button @click="selected = i" class="w-full text-right p-3 rounded-lg border text-sm transition-all" :class="selected === i ? 'bg-[#C5A059]/20 border-[#C5A059] text-[#C5A059]' : (darkMode ? 'bg-white/5 border-white/10 text-gray-300 hover:border-[#C5A059]' : 'bg-gray-50 border-gray-200 text-gray-700 hover:border-[#C5A059]')" x-text="opt"></button>
+                                        </template>
+                                    </div>
+                                    <button @click="if(selected !== null){ if(selected === qs[qIndex].correct) score++; if(qIndex < 9) { qIndex++; selected=null; } else { showRes=true; } }" class="mt-4 px-6 py-2 bg-[#C5A059] text-black font-bold rounded-full text-sm hover:scale-105 transition" :disabled="selected === null" :class="selected === null ? 'opacity-50 cursor-not-allowed' : ''" x-text="isArabic ? (qIndex < 9 ? 'السؤال التالي' : 'إظهار النتيجة') : (qIndex < 9 ? 'Next Question' : 'Show Result')"></button>
+                                </div>
+                                <div x-show="showRes" class="text-center p-6 rounded-xl" :class="darkMode ? 'bg-white/5' : 'bg-gray-100'">
+                                    <h4 class="text-2xl font-bold text-[#C5A059] mb-2" x-text="isArabic ? 'نتيجتك النهائية' : 'Final Score'"></h4>
+                                    <div class="text-4xl font-black mb-4" :class="darkMode ? 'text-white' : 'text-black'" x-text="score + ' / 10'"></div>
+                                    <button @click="qIndex=0; score=0; showRes=false; selected=null;" class="px-6 py-2 border border-[#C5A059] text-[#C5A059] rounded-full text-sm font-bold hover:bg-[#C5A059] hover:text-black transition" x-text="isArabic ? 'إعادة الاختبار' : 'Retry Quiz'"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="rounded-[20px] overflow-hidden border sticky top-28" :class="darkMode ? 'border-[#C5A059]/20 shadow-[0_0_30px_rgba(197,160,89,0.15)]' : 'border-[#C5A059]/30 shadow-lg'">
+                        <img src="vn_export.png" alt="VN Export" class="w-full h-auto max-h-[600px] object-cover hover:scale-105 transition-transform duration-700">
+                    </div>
+                </div>
+
+                <!-- Final Project -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    <div class="lg:col-span-8">
+                        <div :class="darkMode ? 'bg-gradient-to-r from-[#C5A059]/20 to-[#1A1A1A] border-[#C5A059]/50' : 'bg-gradient-to-r from-[#C5A059]/10 to-white border-[#C5A059]/40'" class="p-8 rounded-[20px] border shadow-[0_0_20px_rgba(197,160,89,0.15)] relative overflow-hidden">
+                            <div class="absolute -right-10 -top-10 text-9xl opacity-10">🏆</div>
+                            <div class="relative z-10">
+                                <h3 class="amiri-title text-3xl font-black text-[#C5A059] mb-4 flex items-center gap-3">
+                                    🏆 مشروع التخرج (تطبيق عملي متكامل)
+                                </h3>
+                                <p class="text-sm font-bold mb-4" :class="darkMode ? 'text-gray-300' : 'text-gray-700'">يُطلب في نهاية الدورة إنتاج فيديو متكامل يدمج كل ما سبق. يمكن أن يكون:</p>
+                                <ul class="text-sm space-y-4 leading-relaxed" :class="darkMode ? 'text-gray-300' : 'text-gray-700'">
+                                    <li class="flex items-start gap-3">
+                                        <span class="text-[#C5A059] font-bold">1.</span>
+                                        <div>
+                                            <strong>فيديو ترويجي قصير:</strong> إعلان لفعالية أو مخيم صيفي باستخدام مؤثرات بصرية حركية وموسيقى حماسية.
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start gap-3">
+                                        <span class="text-[#C5A059] font-bold">2.</span>
+                                        <div>
+                                            <strong>محتوى تعليمي تفاعلي:</strong> فيديو موجه للأطفال أو الطلاب، يعتمد على النصوص المتحركة، المؤثرات الصوتية الجذابة، وألوان واضحة ومشرقة.
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start gap-3">
+                                        <span class="text-[#C5A059] font-bold">3.</span>
+                                        <div>
+                                            <strong>فيديو استعراضي (Showreel):</strong> دمج لقطات فنية متسلسلة مع تلوين سينمائي فاخر وانتقالات متزامنة مع الإيقاع الصوتي.
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-4 rounded-[20px] overflow-hidden border sticky top-28" :class="darkMode ? 'border-[#C5A059]/50 shadow-[0_0_30px_rgba(197,160,89,0.3)]' : 'border-[#C5A059]/40 shadow-xl'">
+                        <img src="vn_trophy.png" alt="VN Final Project" class="w-full h-auto object-cover hover:scale-105 transition-transform duration-700">
+                    </div>
+                </div>
+                
+                <div class="text-center pt-8 pb-4">
+                    <button @click="currentPage = 'montage_basics'; window.scrollTo(0,0);" class="inline-flex items-center gap-3 px-8 py-3 rounded-full bg-transparent hover:bg-[#C5A059]/10 border border-[#C5A059]/40 text-[#C5A059] font-bold text-sm transition">
+                        <span>&larr;</span>
+                        <span x-text="isArabic ? 'الرجوع إلى أساسيات المونتاج' : 'Back to Basics'"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ================= FOOTER ================= -->
+    <footer class="border-t border-[#C5A059]/10 py-10 bg-black text-center text-xs text-gray-500 space-y-6">
+        <!-- Live Visitor Stats Badge -->
+        <div class="flex flex-wrap justify-center items-center gap-6 text-[11px] font-bold tracking-wider uppercase">
+            <!-- Global Visitor Counter -->
+            <div class="flex items-center gap-2 px-4 py-2 rounded-full border border-[#C5A059]/20 bg-[#C5A059]/5 text-[#C5A059] shadow-[0_0_15px_rgba(197,160,89,0.05)]">
+                <span class="text-sm">👥</span>
+                <span x-text="isArabic ? 'إجمالي الزيارات:' : 'Total Visits:'"></span>
+                <span class="font-mono text-xs bg-black/40 px-2.5 py-0.5 rounded text-white border border-white/10" x-text="visitorCount">...</span>
+            </div>
+            
+            <!-- Live Active Designers Counter -->
+            <div class="flex items-center gap-2 px-4 py-2 rounded-full border border-green-500/20 bg-green-500/5 text-green-400 shadow-[0_0_15px_rgba(34,197,94,0.05)]">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                </span>
+                <span x-text="isArabic ? 'المصممين النشطين الآن:' : 'Designers Online:'"></span>
+                <span class="font-mono text-xs bg-black/40 px-2.5 py-0.5 rounded text-white border border-white/10" x-text="activeDesigners">...</span>
+            </div>
+        </div>
+
+        <div class="space-y-2">
+            <p class="playfair-title text-sm text-[#C5A059]" x-text="isArabic ? 'أكاديمية فضيل كرشاني للفنون البصرية' : 'Fodil Kerchani Visual Academy'"></p>
+            <p>&copy; 2026 Fodil Prod. Designed & Programmed dynamically with extreme luxury and 3D precision.</p>
+        </div>
+    </footer>
+
+    <!-- ================= DYNAMIC ACADEMY APP STATE (ALPINJS JS) ================= -->
+    <script>
+        function academyApp() {
+            return {
+                darkMode: true,
+                isArabic: true,
+                currentPage: 'home',
+                visitorCount: '12,458',
+                activeDesigners: 8,
+                
+                // Academy 32 levels state
+                academyMode: 'hub', // hub, playing, complete
+                currentCategory: 'balance',
+                currentLevelIndex: 0,
+                score: 0,
+                levels: [],
+                showFeedback: false,
+                feedbackType: 'correct',
+
+                // Categories parameters
+                categories: {
+                    balance: { 
+                        titleAr: 'التوازن البصري', titleEn: 'Visual Balance',
+                        descAr: 'توزيع الأوزان والكتل الهندسية للوصول للاستقرار.', descEn: 'Visual weight allocation for structural stability.',
+                        color: '#C5A059'
+                    },
+                    contrast: { 
+                        titleAr: 'التباين البصري', titleEn: 'Contrast & Scale',
+                        descAr: 'صناعة بؤر تركيز مذهلة وفصل العناصر.', descEn: 'Construct absolute focal elements and readability.',
+                        color: '#C5A059'
+                    },
+                    alignment: { 
+                        titleAr: 'المحاذاة والشبكات', titleEn: 'Grid & Alignment',
+                        descAr: 'ترتيب العناصر الهندسية بدقة متطابقة.', descEn: 'Organize visual hierarchies with pixel-perfect lines.',
+                        color: '#C5A059'
+                    },
+                    whitespace: { 
+                        titleAr: 'المساحة السلبية', titleEn: 'Negative Space',
+                        descAr: 'ترك مسافات مريحة لتتنفس العين وتظهر الفخامة.', descEn: 'Incorporate layout spacing to let elements breathe.',
+                        color: '#C5A059'
+                    }
+                },
+
+                // Elite 10 Games state
+                currentEliteGameIndex: 0,
+                eliteScore: 0,
+                eliteDifficulty: 10,
+                oddColorGrid: [],
+                correctOddColorIndex: 0,
+                typographyScale: 1.4,
+                visualGravityVal: 40,
+                contrastValue: 120,
+                cropWidth: 150,
+                gridSnapVal: 50,
+                opticalPaddingTB: 20,
+                opticalPaddingLR: 35,
+                asymScale: 55,
+                lineHeightVal: 1.1,
+                bezierCurveVal: 90,
+
+                // Elite games list metadata
+                eliteGames: [
+                    { icon: '🎨', titleAr: 'اللون الغريب', titleEn: 'Color Odd-One-Out', questionAr: 'ابحث عن المربع الذي يختلف في تدرجه اللوني (HSL) عن بقية المربعات بمستوى صعوبة ديناميكي تدرجي.', questionEn: 'Locate the single HSL color grid block that differs from the rest of the palette.' },
+                    { icon: '📐', titleAr: 'التدرج الطباعي', titleEn: 'Typography Scale', questionAr: 'اضبط مقياس الحجم لتحقيق النسبة الذهبية الدقيقة (1.618) بين أحجام العناوين الكبرى والنصوص الفرعية.', questionEn: 'Slide parameters to align title and subtitle dimensions to the absolute golden ratio.' },
+                    { icon: '⚖️', titleAr: 'ميزان الجاذبية', titleEn: 'Visual Gravity', questionAr: 'اسحب الرمز الذهبي لتحديد موقع الاتزان البصري المثالي ليتساوى مع كتلة العنصر الداكن الأيسر الثقيل.', questionEn: 'Position the accent golden element to balance the asymmetrical spatial density.' },
+                    { icon: '🌗', titleAr: 'حاسبة التباين', titleEn: 'WCAG Contrast', questionAr: 'عدّل سطوع الخط لتصل نسبة تباين الخط مع الخلفية لمعيار WCAG AAA الممتاز بنسبة 7.0:1 بالضبط.', questionEn: 'Modify text parameters to reach absolute readability target metrics of 7.0:1 contrast ratios.' },
+                    { icon: '✂️', titleAr: 'النسبة الذهبية', titleEn: 'Golden Crop', questionAr: 'غيّر عرض صندوق القص البصري لتطابق النسبة البنيوية الذهبية 1.618 مقارنة بارتفاع الصندوق المثبت.', questionEn: 'Crop the container to achieve the golden geometric ratio width (1.618 of height).' },
+                    { icon: '📦', titleAr: 'شبكة الأعمدة', titleEn: '12-Col Snapping', questionAr: 'اضبط العرض التناسبي لتقطع الكتلة الرئيسية 8 أعمدة تماماً من أصل 12 في الشبكة الهندسية المعتمدة.', questionEn: 'Align layout boundaries to occupy exactly 8 of the 12 columns grid structure.' },
+                    { icon: '💨', titleAr: 'الحشوة البصرية', titleEn: 'Optical Padding', questionAr: 'عدّل قيم الهامشين العلوي والأيسر لتوسيط نص الزر بصورة متساوية هندسياً وبصرياً على جميع الجوانب.', questionEn: 'Adjust internal button margins to establish optically symmetric text spacing.' },
+                    { icon: '🧬', titleAr: 'توازن اللا-تماثل', titleEn: 'Asym Balance', questionAr: 'اضبط مقاس دائرة الإبراز الذهبية لتوازن الكتلة الفنية الداكنة الكبرى بصرياً في الجانب الآخر.', questionEn: 'Establish balanced weight through asymmetrical layout sizing variables.' },
+                    { icon: '📖', titleAr: 'ارتفاع الأسطر', titleEn: 'Line Height spacing', questionAr: 'اضبط المنزلق لتصل بالفقرة لمعدل ارتفاع السطور القياسي لمقروئية الخطوط العربية (1.6).', questionEn: 'Adjust text lines spacing parameters to achieve optimal structural reading speed.' },
+                    { icon: '✒️', titleAr: 'منحنى بيزييه', titleEn: 'Bezier curve', questionAr: 'عدل عمق المقبض لثني القوس ليطابق القوس الأصلي المخفي بدقة متناهية للحصول على منحنى شعار مثالي.', questionEn: 'Adjust handle vectors to map curvature metrics onto the hidden brand curve path.' }
+                ],
+
+                get currentLevel() {
+                    return this.levels[this.currentLevelIndex];
+                },
+
+                get activeEliteGame() {
+                    return this.eliteGames[this.currentEliteGameIndex];
+                },
+
+                // Elite Challenges Controllers
+                startEliteMode() {
+                    this.eliteScore = 0;
+                    this.selectEliteGame(0);
+                },
+
+                selectEliteGame(index) {
+                    this.currentEliteGameIndex = index;
+                    this.eliteScore = 0;
+                    if (index === 0) {
+                        this.eliteDifficulty = 10;
+                        this.generateOddColorGrid();
+                    } else if (index === 1) {
+                        this.typographyScale = 1.2;
+                    } else if (index === 2) {
+                        this.visualGravityVal = 40;
+                    } else if (index === 3) {
+                        this.contrastValue = 180;
+                    } else if (index === 4) {
+                        this.cropWidth = 140;
+                    } else if (index === 5) {
+                        this.gridSnapVal = 45;
+                    } else if (index === 6) {
+                        this.opticalPaddingTB = 18;
+                        this.opticalPaddingLR = 30;
+                    } else if (index === 7) {
+                        this.asymScale = 110;
+                    } else if (index === 8) {
+                        this.lineHeightVal = 1.0;
+                    } else if (index === 9) {
+                        this.bezierCurveVal = 110;
+                    }
+                },
+
+                // Generate Color Grid for Game 1
+                generateOddColorGrid() {
+                    const baseHue = Math.floor(Math.random() * 360);
+                    const baseSat = Math.floor(Math.random() * 30) + 60; // 60-90%
+                    const baseLight = Math.floor(Math.random() * 20) + 40; // 40-60%
+                    
+                    this.correctOddColorIndex = Math.floor(Math.random() * 9);
+                    this.oddColorGrid = [];
+                    
+                    for (let i = 0; i < 9; i++) {
+                        if (i === this.correctOddColorIndex) {
+                            // Add discrepancy based on difficulty
+                            const modifiedLight = baseLight + (Math.random() > 0.5 ? this.eliteDifficulty : -this.eliteDifficulty);
+                            this.oddColorGrid.push({ color: `hsl(${baseHue}, ${baseSat}%, ${modifiedLight}%)` });
+                        } else {
+                            this.oddColorGrid.push({ color: `hsl(${baseHue}, ${baseSat}%, ${baseLight}%)` });
+                        }
+                    }
+                },
+
+                submitOddColorChoice(index) {
+                    if (index === this.correctOddColorIndex) {
+                        this.eliteScore = 100;
+                        // Level up hardness
+                        if (this.eliteDifficulty > 3) this.eliteDifficulty -= 2;
+                        setTimeout(() => {
+                            this.generateOddColorGrid();
+                            this.eliteScore = 0;
+                        }, 1200);
+                        alert(this.isArabic ? "✅ إصابة بصرية دقيقة! زيادة مستوى الصعوبة التنافسية." : "✅ Excellent eye accuracy! Difficulty levels up.");
+                    } else {
+                        this.eliteScore = 0;
+                        alert(this.isArabic ? "❌ خطأ، ركز على تمييز تشبع الألوان!" : "❌ Mismatch, trace the saturation variation!");
+                    }
+                },
+
+                resetOddColorGame() {
+                    this.eliteDifficulty = 10;
+                    this.generateOddColorGrid();
+                },
+
+                submitEliteGameScore() {
+                    let scoreVal = 0;
+                    if (this.currentEliteGameIndex === 1) {
+                        // Typography: Target is 1.618
+                        const diff = Math.abs(parseFloat(this.typographyScale) - 1.618);
+                        scoreVal = Math.max(0, 100 - Math.round(diff * 180));
+                    } else if (this.currentEliteGameIndex === 2) {
+                        // Visual Gravity: Target is 62
+                        const diff = Math.abs(parseInt(this.visualGravityVal) - 62);
+                        scoreVal = Math.max(0, 100 - Math.round(diff * 3));
+                    } else if (this.currentEliteGameIndex === 3) {
+                        // WCAG Contrast: Target is 185 (corresponds to around 7.0:1)
+                        const diff = Math.abs(parseInt(this.contrastValue) - 185);
+                        scoreVal = Math.max(0, 100 - Math.round(diff * 2));
+                    } else if (this.currentEliteGameIndex === 4) {
+                        // Golden Crop: Width target is ~194px (1.618 of 120)
+                        const diff = Math.abs(parseInt(this.cropWidth) - 194);
+                        scoreVal = Math.max(0, 100 - Math.round(diff * 1.5));
+                    } else if (this.currentEliteGameIndex === 5) {
+                        // Grid snapping: Target is 66% (columns share target ratio)
+                        const diff = Math.abs(parseInt(this.gridSnapVal) - 66);
+                        scoreVal = Math.max(0, 100 - Math.round(diff * 3.5));
+                    } else if (this.currentEliteGameIndex === 6) {
+                        // Optical padding: TB target is 40, LR target is 50
+                        const diffTB = Math.abs(parseInt(this.opticalPaddingTB) - 40);
+                        const diffLR = Math.abs(parseInt(this.opticalPaddingLR) - 50);
+                        scoreVal = Math.max(0, 100 - Math.round((diffTB + diffLR) * 1.8));
+                    } else if (this.currentEliteGameIndex === 7) {
+                        // Asym balance scale: Target weight matches ~80px
+                        const diff = Math.abs(parseInt(this.asymScale) - 80);
+                        scoreVal = Math.max(0, 100 - Math.round(diff * 2.2));
+                    } else if (this.currentEliteGameIndex === 8) {
+                        // Line height: Target is 1.6
+                        const diff = Math.abs(parseFloat(this.lineHeightVal) - 1.6);
+                        scoreVal = Math.max(0, 100 - Math.round(diff * 150));
+                    } else if (this.currentEliteGameIndex === 9) {
+                        // Bezier path depth: Target is 10
+                        const diff = Math.abs(parseInt(this.bezierCurveVal) - 10);
+                        scoreVal = Math.max(0, 100 - Math.round(diff * 1.8));
+                    }
+                    this.eliteScore = scoreVal;
+                },
+
+                // Original 32 level core controllers
+                startCategory(cat) {
+                    this.currentCategory = cat;
+                    this.currentLevelIndex = 0;
+                    this.score = 0;
+                    this.showFeedback = false;
+                    this.generateLevels(cat);
+                    this.academyMode = 'playing';
+                    window.scrollTo(0,0);
+                },
+
+                generateLevels(cat) {
+                    this.levels = [];
+                    // Populate exactly 8 levels for the selected category
+                    for(let i=1; i<=8; i++) {
+                        let level = { id: i, type: '', question: '', options: [] };
+                        
+                        let seed1 = cat + '_L_A_' + i;
+                        let seed2 = cat + '_L_B_' + i;
+                        let isA_Correct = Math.random() > 0.5;
+
+                        // Balance Track
+                        if (cat === 'balance') {
+                            if (i <= 5) {
+                                level.type = 'ab_quiz';
+                                level.question = this.isArabic 
+                                    ? `المستوى ${i}: حدد التصميم الذي يمتلك استقراراً ووزناً بصرياً مريحاً للعين.` 
+                                    : `Level ${i}: Identify the layout containing optically balanced weight proportions.`;
+                                level.options = [
+                                    { id: 'A', img: `https://picsum.photos/seed/${seed1}/800/600`, isCorrect: isA_Correct, badStyle: isA_Correct ? '' : 'justify-content: flex-start; align-items: flex-start; padding: 10px;' },
+                                    { id: 'B', img: `https://picsum.photos/seed/${seed2}/800/600`, isCorrect: !isA_Correct, badStyle: !isA_Correct ? '' : 'justify-content: flex-end; align-items: flex-end; padding: 10px;' }
+                                ];
+                            } else {
+                                level.type = 'interactive_fix';
+                                level.question = this.isArabic 
+                                    ? `المستوى ${i}: التصميم يعاني من ثقل بصري مائل في الركن السفلي. أصلح المحاذاة لإعادة الاتزان.` 
+                                    : `Level ${i}: Visual density leaning to the lower corner. Correct the layout to restore equilibrium.`;
+                                level.isFixed = false;
+                                level.badStyle = 'justify-content: flex-start; align-items: flex-end;';
+                                level.goodStyle = 'justify-content: center; align-items: center;';
+                            }
+                        } 
+                        // Contrast Track
+                        else if (cat === 'contrast') {
+                            if (i <= 5) {
+                                level.type = 'ab_quiz';
+                                level.question = this.isArabic 
+                                    ? `المستوى ${i}: أي الخيارين يمتلك درجة تباين كافية لراحة العين ومقروئية النص؟` 
+                                    : `Level ${i}: Which option utilizes high contrast ratios for comfortable legibility standards?`;
+                                level.options = [
+                                    { id: 'A', img: `https://picsum.photos/seed/${seed1}/800/600`, isCorrect: isA_Correct, textStyle: isA_Correct ? 'color: #C5A059; text-shadow: 0 4px 15px rgba(0,0,0,0.9);' : 'color: rgba(197,160,89,0.25); text-shadow: none;' },
+                                    { id: 'B', img: `https://picsum.photos/seed/${seed2}/800/600`, isCorrect: !isA_Correct, textStyle: !isA_Correct ? 'color: #C5A059; text-shadow: 0 4px 15px rgba(0,0,0,0.9);' : 'color: rgba(197,160,89,0.3); text-shadow: none;' }
+                                ];
+                            } else {
+                                level.type = 'interactive_slider';
+                                level.question = this.isArabic 
+                                    ? `المستوى ${i}: النص غامض جداً! عدّل سطوع الخلفية لتجعل النص مقروءاً بتباين مثالي.` 
+                                    : `Level ${i}: The layout is highly illegible! Slide background brightness parameters until text is fully readable.`;
+                                level.sliderValue = 5; 
+                            }
+                        }
+                        // Alignment Track
+                        else if (cat === 'alignment') {
+                            if (i <= 5) {
+                                level.type = 'ab_quiz';
+                                level.question = this.isArabic 
+                                    ? `المستوى ${i}: حدد التصميم الذي تصطف عناصره بانتظام هندسي دقيق.` 
+                                    : `Level ${i}: Identify the layout featuring symmetrical pixel alignment.`;
+                                level.options = [
+                                    { id: 'A', img: `https://picsum.photos/seed/${seed1}/800/600`, isCorrect: isA_Correct, wrapperStyle: isA_Correct ? 'align-items: flex-start; justify-content: center;' : 'align-items: center; padding-left: 25%; justify-content: center;' },
+                                    { id: 'B', img: `https://picsum.photos/seed/${seed2}/800/600`, isCorrect: !isA_Correct, wrapperStyle: !isA_Correct ? 'align-items: flex-end; justify-content: center;' : 'align-items: center; padding-right: 25%; justify-content: center;' }
+                                ];
+                            } else {
+                                level.type = 'interactive_fix';
+                                level.question = this.isArabic 
+                                    ? `المستوى ${i}: العناصر تظهر كعتبات عشوائية ومبعثرة! اضغط لتوحيد محاذاتها لليمين.` 
+                                    : `Level ${i}: Core assets are scattered. Snaps structural elements together with standard right alignment.`;
+                                level.isFixed = false;
+                                level.badStyle = 'align-items: flex-end; justify-content: flex-end; gap: 30px;';
+                                level.goodStyle = 'align-items: flex-start; justify-content: center; gap: 12px;';
+                            }
+                        }
+                        // Whitespace Track
+                        else if (cat === 'whitespace') {
+                            if (i <= 5) {
+                                level.type = 'ab_quiz';
+                                level.question = this.isArabic 
+                                    ? `المستوى ${i}: أي التصميمين يبدو أهدأ وأكثر فخامة بفضل الفراغ السلبي المريح؟` 
+                                    : `Level ${i}: Which option looks elegant and clean due to positive negative space buffers?`;
+                                level.options = [
+                                    { id: 'A', img: `https://picsum.photos/seed/${seed1}/800/600`, isCorrect: isA_Correct, padding: isA_Correct ? 'padding: 50px; max-width: 65%;' : 'padding: 6px; max-width: 95%;' },
+                                    { id: 'B', img: `https://picsum.photos/seed/${seed2}/800/600`, isCorrect: !isA_Correct, padding: !isA_Correct ? 'padding: 50px; max-width: 65%;' : 'padding: 6px; max-width: 95%;' }
+                                ];
+                            } else {
+                                level.type = 'interactive_slider';
+                                level.question = this.isArabic 
+                                    ? `المستوى ${i}: التصميم يختنق! استخدم المنزلق لزيادة المساحة السلبية حول المربع الداخلي.` 
+                                    : `Level ${i}: Layout content is choked. Increase internal padding buffer to let structural blocks breathe.`;
+                                level.sliderValue = 5; 
+                            }
+                        }
+                        
+                        this.levels.push(level);
+                    }
+                },
+
+                submitAnswer(isCorrect) {
+                    this.showFeedback = true;
+                    if (isCorrect) {
+                        this.feedbackType = 'correct';
+                        this.score += 10;
+                    } else {
+                        this.feedbackType = 'wrong';
+                    }
+                },
+
+                checkSliderAnswer() {
+                    let val = parseInt(this.currentLevel.sliderValue);
+                    let isCorrect = false;
+                    if (this.currentCategory === 'contrast' && val >= 70) isCorrect = true;
+                    if (this.currentCategory === 'whitespace' && val >= 45) isCorrect = true;
+                    this.submitAnswer(isCorrect);
+                },
+
+                nextLevel() {
+                    this.showFeedback = false;
+                    if (this.currentLevelIndex < 7) {
+                        this.currentLevelIndex++;
+                    } else {
+                        this.academyMode = 'complete';
+                    }
+                    window.scrollTo(0,0);
+                },
+
+                init() {
+                    this.initVisitorCounter();
+                    setInterval(() => {
+                        this.activeDesigners = Math.floor(Math.random() * 10) + 6;
+                    }, 5000);
+                },
+
+                async initVisitorCounter() {
+                    let localCount = localStorage.getItem('fodil_prod_visitors');
+                    if (!localCount) {
+                        localCount = 12458;
+                    } else {
+                        localCount = parseInt(localCount) + 1;
+                    }
+                    localStorage.setItem('fodil_prod_visitors', localCount);
+                    this.visitorCount = localCount.toLocaleString();
+
+                    try {
+                        const res = await fetch('https://api.counterapi.dev/v1/fodilprod/visits/up');
+                        if (res.ok) {
+                            const data = await res.json();
+                            if (data && data.value) {
+                                const finalCount = 12458 + data.value;
+                                this.visitorCount = finalCount.toLocaleString();
+                            }
+                        }
+                    } catch (e) {
+                        console.log("Visitor API offline, using local counter: ", e);
+                    }
+                }
+            };
+        }
+    </script>
+</body>
+</html>
